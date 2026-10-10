@@ -2,13 +2,24 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- viewport-fit=cover lets the app use the full screen around a phone's notch -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <!-- Colour of the phone's browser bar, and full-screen mode when added to the home screen -->
+  <meta name="theme-color" content="#F4F3EE">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Backtrack">
   <title>Backtrack</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@500;700;800&display=swap">
+  <!-- All styles are in this one file -->
   <link rel="stylesheet" href="/backtrack.css">
-  <link rel="stylesheet" href="/components/nav.css">
 </head>
 <body>
+<!-- The phone: on a laptop it's drawn as a phone frame; on a real phone it fills the screen -->
+<div class="phone" id="phone">
+ <!-- Everything in here scrolls. main.js adds the tab bar after it, at the bottom of the phone. -->
+ <div class="phone-screen" id="screen">
   <!-- Top bar: logo on the left, menu button on the right. Stays on every page. -->
   <header class="bt-topbar" id="topbar">
     <div class="bt-topbar-inner">
@@ -28,6 +39,8 @@
 
   <!-- main.js puts the current page in here -->
   <div class="page" id="app"></div>
+ </div>
+</div>
 
   <!-- Components first (they set up window.Backtrack), then the router -->
   <script src="/components/navbar.js"></script>

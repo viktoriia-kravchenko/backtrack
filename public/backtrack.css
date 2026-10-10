@@ -1,114 +1,216 @@
-/* Backtrack styles: design tokens, shared components, loading screen, home page.
-   Use the variables everywhere; don't hard-code hex values in components. */
+/* =====================================================================
+   BACKTRACK STYLESHEET
+   ---------------------------------------------------------------------
+   To change the look, edit the variables in sections 1 to 3.
+   Everything below them uses those variables, so you rarely need to
+   touch the rest.
 
-/* ---------- Design tokens (from the design brief) ---------- */
+   Contents
+     1. Theme colours   (light by default; a dark version is in the comment)
+     2. Line colours    (yellow, orange, red, pink, blue, green)
+     3. Type, shape, spacing, motion, phone frame size
+     4. Base and the phone frame
+     5. Top bar
+     6. Shared components: bullet, sign card, board, kicker, pill, rule, buttons
+     7. Bottom tab bar
+     8. Menu
+     9. Toast
+    10. Loading screen
+    11. Home page
+    12. Placeholder pages
+    13. Reduced motion
+   ===================================================================== */
+
+
+/* ---------- 1. Theme colours: EDIT HERE ---------- */
 :root {
-  /* Ground and ink */
-  --bt-black: #000000;        /* app background */
-  --bt-surface: #111111;      /* raised panels on black */
-  --bt-white: #FFFFFF;        /* primary text, sign cards */
-  --bt-ink: #000000;          /* text on white or yellow */
-  --bt-ink-soft: #4A4A4A;     /* secondary text on white (added: 8.9:1 contrast) */
-  --bt-soft: #CFCFCF;         /* secondary text on black */
-  --bt-dim: #8A8A8A;          /* labels, captions */
-  --bt-rule: #FFFFFF;         /* sign rules */
+  --bt-bg: #F4F3EE;           /* app background (off-white) */
+  --bt-desk: #DCDAD2;         /* area around the phone on a laptop screen */
+  --bt-card: #FFFFFF;         /* cards, tab bar */
+  --bt-edge: #DEDCD5;         /* thin outlines around cards */
+  --bt-text: #000000;         /* main text */
+  --bt-text-soft: #4A4A4A;    /* secondary text (passes contrast on white and off-white) */
+  --bt-bad-text: #C42B22;     /* "Severe delays" etc. Darker than --bt-red so it's readable as text */
+  --bt-focus: #000000;        /* keyboard focus outline */
 
-  /* Line colours */
-  --bt-yellow: #FFD02F;       /* hero: money, active, primary CTA */
+  /* The black "departure board" panel behind the big money number */
+  --bt-board-bg: #000000;
+  --bt-board-text: #FFFFFF;
+  --bt-board-soft: #CFCFCF;
+
+  /* Fixed colours used on top of yellow, green etc. */
+  --bt-ink: #000000;
+  --bt-white: #FFFFFF;
+}
+
+/* Dark version: to switch, replace the values above with these.
+   --bt-bg: #000000;  --bt-desk: #1A1A1A;  --bt-card: #111111;  --bt-edge: #2A2A2A;
+   --bt-text: #FFFFFF;  --bt-text-soft: #CFCFCF;  --bt-bad-text: #FF6B63;  --bt-focus: #FFD02F;
+*/
+
+
+/* ---------- 2. Line colours ---------- */
+:root {
+  --bt-yellow: #FFD02F;       /* hero: money, active tab, main button */
   --bt-orange: #FF6A1A;       /* claims in progress */
   --bt-red: #F2453D;          /* problems, not eligible */
   --bt-pink: #FF52B4;         /* Treat Yourself pot */
-  --bt-blue: #2F7BF5;         /* Engine / bank actions */
-  --bt-green: #4FD44F;        /* paid, saved, savings pot */
+  --bt-blue: #2F7BF5;         /* bank actions */
+  --bt-green: #4FD44F;        /* paid, saved */
+}
 
-  /* Type */
+
+/* ---------- 3. Type, shape, spacing, motion, phone frame size ---------- */
+:root {
   --bt-font: "Inter", "Helvetica Neue", Arial, sans-serif;
-  --bt-mono: "JetBrains Mono", ui-monospace, monospace;
-  --bt-display: 800 3.5rem/1.0 var(--bt-font);   /* big amounts */
+  --bt-display: 800 3.5rem/1.0 var(--bt-font);   /* big money amounts */
   --bt-h1: 700 2rem/1.1 var(--bt-font);
   --bt-h2: 700 1.25rem/1.2 var(--bt-font);
   --bt-body: 500 1rem/1.45 var(--bt-font);
   --bt-small: 500 0.875rem/1.4 var(--bt-font);
-  --bt-kicker: 700 0.75rem/1 var(--bt-font);     /* UPPERCASE, 0.18em tracking */
+  --bt-kicker: 700 0.75rem/1 var(--bt-font);     /* small UPPERCASE labels */
 
-  /* Shape and space (8 px grid) */
-  --bt-radius-card: 16px;
+  --bt-radius-card: 20px;
   --bt-radius-pill: 999px;
-  --bt-strip: 8px;            /* coloured top strip on sign cards */
+  --bt-strip: 8px;            /* coloured strip on top of sign cards */
+
   --bt-space-1: 8px;
   --bt-space-2: 16px;
   --bt-space-3: 24px;
   --bt-space-4: 32px;
-  --bt-gutter: 20px;          /* side padding on phone */
+  --bt-gutter: 20px;          /* side padding */
 
-  /* Motion */
   --bt-ease: cubic-bezier(.2, .8, .2, 1);
   --bt-fast: 150ms;
   --bt-slow: 400ms;
+
+  /* The phone frame shown on a laptop (sizes of an iPhone 14) */
+  --bt-app-width: 390px;      /* screen width */
+  --bt-app-height: 844px;     /* screen height (shrinks to fit shorter laptop screens) */
+  --bt-bezel: 12px;           /* thickness of the phone's black edge */
+  --bt-bezel-colour: #111111;
+  --bt-phone-radius: 48px;    /* roundness of the phone's corners */
+  --bt-tabbar-height: 72px;
 }
 
-/* ---------- Base ---------- */
+
+/* ---------- 4. Base and the phone frame ---------- */
 * { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+/* The laptop screen: a plain background with the phone in the middle */
 body {
-  margin: 0; background: var(--bt-black); color: var(--bt-white);
-  font: var(--bt-body); -webkit-font-smoothing: antialiased;
+  margin: 0;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--bt-desk);
+  color: var(--bt-text);
+  font: var(--bt-body);
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;  /* no grey flash when tapping on phones */
 }
+
+/* The phone. Its height shrinks to fit if the laptop screen is short. */
+.phone {
+  --phone-height: min(calc(var(--bt-app-height) + var(--bt-bezel) * 2), calc(100dvh - 32px));
+  position: relative;
+  width: calc(var(--bt-app-width) + var(--bt-bezel) * 2);
+  height: var(--phone-height);
+  display: flex; flex-direction: column;
+  overflow: hidden;
+  background: var(--bt-bg);
+  border: var(--bt-bezel) solid var(--bt-bezel-colour);
+  border-radius: var(--bt-phone-radius);
+}
+
+/* The phone's screen: the only part that scrolls, like a real app */
+.phone-screen {
+  flex: 1; min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;   /* scrolling stops at the edges instead of moving the page */
+  scrollbar-width: none;          /* hide the scrollbar (Firefox) */
+}
+.phone-screen::-webkit-scrollbar { display: none; } /* hide the scrollbar (Chrome, Safari) */
+
+/* On an actual phone (narrow screen), drop the frame and fill the screen */
+@media (max-width: 500px) {
+  body { display: block; background: var(--bt-bg); }
+  .phone {
+    --phone-height: 100dvh;
+    width: 100%; border: 0; border-radius: 0;
+  }
+}
+
 a { color: inherit; }
 h1, h2, h3, p { margin: 0; }
 h1:focus { outline: none; }
-:focus-visible { outline: 3px solid var(--bt-yellow); outline-offset: 2px; border-radius: 8px; }
+button, a { touch-action: manipulation; } /* removes the tap delay on phones */
+:focus-visible { outline: 3px solid var(--bt-focus); outline-offset: 2px; border-radius: 8px; }
 .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
-.page { max-width: 480px; margin: 0 auto; padding: var(--bt-space-2) var(--bt-gutter) var(--bt-space-4); }
+.page { padding: var(--bt-space-1) var(--bt-gutter) var(--bt-space-4); }
 main { display: flex; flex-direction: column; gap: var(--bt-space-3); }
+
+/* 150 ms fade between screens */
 .page.is-entering { animation: bt-fade var(--bt-fast) var(--bt-ease); }
 @keyframes bt-fade { from { opacity: 0; } }
 
-.text-link {
-  display: inline-flex; align-items: center; min-height: 44px;
-  color: var(--bt-white); font-weight: 700; text-underline-offset: 4px;
-}
 
-/* ---------- Top bar ---------- */
-.bt-topbar { position: sticky; top: 0; z-index: 1; background: var(--bt-black); }
+/* ---------- 5. Top bar ---------- */
+.bt-topbar {
+  position: sticky; top: 0; z-index: 2;
+  background: var(--bt-bg);
+  padding-top: env(safe-area-inset-top);     /* space for the phone's notch */
+}
 .bt-topbar-inner {
-  max-width: 480px; margin: 0 auto; padding: 12px var(--bt-gutter);
+  min-height: 64px; padding: 8px var(--bt-gutter);
   display: flex; justify-content: space-between; align-items: center;
 }
-.bt-wordmark { display: flex; align-items: center; gap: 10px; min-height: 44px; font: 800 1.25rem/1 var(--bt-font); text-decoration: none; }
+.bt-wordmark {
+  display: flex; align-items: center; gap: 10px; min-height: 44px;
+  font: 800 1.25rem/1 var(--bt-font); text-decoration: none;
+}
 .bt-mark { width: 36px; height: 26px; }
 .bt-mark path { fill: none; stroke-width: 12; stroke-linecap: round; }
 .bt-menu-button {
   width: 48px; height: 48px; border-radius: 50%;
   display: grid; place-items: center; cursor: pointer;
-  background: transparent; color: var(--bt-white); border: 2px solid var(--bt-white);
+  background: var(--bt-card); color: var(--bt-text); border: 1.5px solid var(--bt-edge);
 }
 
-/* ---------- Shared components ---------- */
 
-/* Line bullet: step numbers, pot icons, line letters */
+/* ---------- 6. Shared components ---------- */
+
+/* Line bullet: a circle with a letter or number */
 .bt-bullet {
   flex: none; inline-size: 36px; block-size: 36px; border-radius: 50%;
   display: grid; place-items: center;
   font: 700 1rem/1 var(--bt-font); color: var(--bt-ink);
-  background: var(--line, var(--bt-white));
+  background: var(--line, var(--bt-card));
+  box-shadow: inset 0 0 0 2px var(--bt-ink);
 }
 .bt-bullet[data-line="blue"] { --line: var(--bt-blue); color: var(--bt-white); }
 
-/* Station-sign card: white card, coloured top strip, black text. One card = one thing. */
+/* Station-sign card: white card with a coloured strip on top. One card = one thing. */
 .bt-sign {
-  display: block; background: var(--bt-white); color: var(--bt-ink);
-  border-radius: var(--bt-radius-card); overflow: hidden;
+  display: block; overflow: hidden; text-decoration: none;
+  background: var(--bt-card); color: var(--bt-ink);
+  border: 1.5px solid var(--bt-edge);
   border-top: var(--bt-strip) solid var(--line, var(--bt-yellow));
+  border-radius: var(--bt-radius-card);
   padding: var(--bt-space-2) var(--bt-space-3);
-  text-decoration: none;
 }
+/* Tappable cards shrink slightly when pressed, like a native app */
+a.bt-sign { transition: transform var(--bt-fast) var(--bt-ease); }
+a.bt-sign:active { transform: scale(0.98); }
 
 /* Board number: big money amounts */
 .bt-board { font: var(--bt-display); letter-spacing: -0.03em; color: var(--bt-yellow); }
 
-/* Kicker: small uppercase label on black */
-.bt-kicker { font: var(--bt-kicker); text-transform: uppercase; letter-spacing: 0.18em; color: var(--bt-soft); }
+/* Kicker: small uppercase label */
+.bt-kicker { font: var(--bt-kicker); text-transform: uppercase; letter-spacing: 0.18em; color: var(--bt-text-soft); }
 
 /* Status pill: always a word, plus a dot */
 .bt-pill {
@@ -120,23 +222,117 @@ main { display: flex; flex-direction: column; gap: var(--bt-space-3); }
 .bt-pill[data-status="eligible"] { background: var(--bt-yellow); color: var(--bt-ink); }
 .bt-pill[data-status="claimed"]  { background: var(--bt-orange); color: var(--bt-ink); }
 .bt-pill[data-status="paid"]     { background: var(--bt-green); color: var(--bt-ink); }
-.bt-pill[data-status="none"]     { border: 1.5px solid var(--bt-dim); color: var(--bt-soft); }
-/* On a white sign card, the outline pill needs dark text to stay readable */
-.bt-sign .bt-pill[data-status="none"] { border-color: var(--bt-ink); color: var(--bt-ink); }
+.bt-pill[data-status="none"]     { border: 1.5px solid var(--bt-ink); color: var(--bt-ink); }
 
-/* Sign rule: separates sections */
-.bt-rule { height: 3px; margin: 0; border: 0; background: var(--bt-rule); }
+/* Sign rule: a thick line between sections */
+.bt-rule { height: 3px; margin: 0; border: 0; background: var(--bt-text); }
 
-/* Buttons */
+/* Buttons and links */
 .bt-btn {
   min-block-size: 52px; padding: 0 var(--bt-space-3); border-radius: 14px; border: 0; cursor: pointer;
   font: 700 1rem/1 var(--bt-font); background: var(--bt-yellow); color: var(--bt-ink);
 }
-.bt-btn--ghost { background: transparent; color: var(--bt-white); border: 2px solid var(--bt-white); }
+.bt-btn--ghost { background: transparent; color: var(--bt-text); border: 2px solid var(--bt-text); }
+.text-link {
+  display: inline-flex; align-items: center; min-height: 44px;
+  color: var(--bt-text); font-weight: 700; text-underline-offset: 4px;
+}
 
-/* ---------- Loading screen ---------- */
+
+/* ---------- 7. Bottom tab bar ---------- */
+/* It's the last item inside .phone, so it always sits at the bottom of the phone */
+.bt-navbar {
+  flex: none; z-index: 2;
+  background: var(--bt-card); border-top: 1.5px solid var(--bt-edge);
+  padding-bottom: env(safe-area-inset-bottom);  /* space for the phone's home bar */
+}
+.bt-navbar-inner { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.bt-tab {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+  min-height: var(--bt-tabbar-height); text-decoration: none; user-select: none;
+  color: var(--bt-text-soft); font: var(--bt-small);
+}
+.bt-tab svg { padding: 3px 16px; border-radius: var(--bt-radius-pill); box-sizing: content-box; }
+.bt-tab.is-active { color: var(--bt-text); font-weight: 700; }
+.bt-tab.is-active svg { background: var(--bt-yellow); color: var(--bt-ink); stroke-width: 2.4; }
+.bt-tab:focus-visible { outline-offset: -4px; }
+
+
+/* ---------- 8. Menu (full-screen sheet inside the app) ---------- */
+/* Sized and centred to sit exactly over the phone's screen */
+.bt-menu {
+  margin: auto; padding: 0; border: 0;
+  width: var(--bt-app-width); max-width: 100%;
+  height: min(var(--bt-app-height), calc(100dvh - 32px - var(--bt-bezel) * 2)); max-height: 100%;
+  border-radius: calc(var(--bt-phone-radius) - var(--bt-bezel));
+  background: var(--bt-bg); color: var(--bt-text);
+}
+@media (max-width: 500px) {
+  .bt-menu { width: 100%; height: 100%; border-radius: 0; }
+}
+.bt-menu::backdrop { background: rgb(0 0 0 / 0.45); }
+.bt-menu[open] { animation: bt-fade var(--bt-fast) var(--bt-ease); }
+
+.bt-menu-panel {
+  min-height: 100%; display: flex; flex-direction: column; gap: var(--bt-space-2);
+  padding: calc(8px + env(safe-area-inset-top)) var(--bt-gutter) calc(var(--bt-space-4) + env(safe-area-inset-bottom));
+}
+.bt-menu-header { display: flex; justify-content: space-between; align-items: center; min-height: 64px; }
+.bt-menu-header h2 { font: var(--bt-h1); }
+.bt-menu-close {
+  width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; cursor: pointer;
+  background: var(--bt-card); color: var(--bt-text); border: 1.5px solid var(--bt-edge);
+}
+
+/* Each group is a sign card */
+.bt-menu-section { padding: 12px var(--bt-space-2) 4px; }
+.bt-menu-section h3 { font: var(--bt-kicker); text-transform: uppercase; letter-spacing: 0.18em; margin-bottom: 4px; }
+.bt-menu-section ul { list-style: none; margin: 0; padding: 0; }
+.bt-menu-section li + li { border-top: 1px solid var(--bt-edge); }
+
+.bt-menu-item {
+  width: 100%; min-height: 56px; padding: 10px 0;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  background: none; border: 0; color: var(--bt-ink); font: var(--bt-body); font-weight: 700; text-align: left; cursor: pointer;
+}
+.bt-menu-text { display: flex; flex-direction: column; }
+.bt-menu-hint { font: var(--bt-small); color: var(--bt-text-soft); }
+.bt-menu-item:focus-visible { outline-color: var(--bt-ink); outline-offset: -2px; }
+
+/* On/off switch: the knob moves AND the colour changes */
+.bt-switch {
+  flex: none; position: relative; width: 52px; height: 30px; border-radius: var(--bt-radius-pill);
+  background: var(--bt-white); border: 2px solid var(--bt-ink);
+}
+.bt-switch-knob {
+  position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%;
+  background: var(--bt-ink); transition: left var(--bt-fast) var(--bt-ease);
+}
+[aria-checked="true"] .bt-switch { background: var(--bt-yellow); }
+[aria-checked="true"] .bt-switch-knob { left: 25px; }
+
+.bt-menu-signout {
+  min-height: 52px; margin-top: var(--bt-space-1); border-radius: 14px; cursor: pointer;
+  background: transparent; color: var(--bt-text); border: 2px solid var(--bt-text); font: 700 1rem/1 var(--bt-font);
+}
+
+
+/* ---------- 9. Toast (short message above the tab bar) ---------- */
+.bt-toast {
+  position: absolute; left: 50%; bottom: calc(var(--bt-tabbar-height) + 20px + env(safe-area-inset-bottom));
+  transform: translateX(-50%); z-index: 3;
+  width: max-content; max-width: calc(100% - 40px);
+  padding: 14px 18px; border-radius: 14px;
+  background: var(--bt-ink); color: var(--bt-white); font: var(--bt-body); font-weight: 700;
+  border-top: var(--bt-strip) solid var(--bt-yellow);
+  opacity: 0; pointer-events: none; transition: opacity var(--bt-fast) var(--bt-ease);
+}
+.bt-toast.is-visible { opacity: 1; }
+
+
+/* ---------- 10. Loading screen ---------- */
 .splash {
-  min-height: calc(100vh - 48px); display: flex; flex-direction: column;
+  min-height: calc(var(--phone-height) - var(--bt-bezel) * 2 - 48px); display: flex; flex-direction: column;
   align-items: center; justify-content: center; text-align: center;
 }
 .splash-logo { width: 140px; height: 100px; }
@@ -151,50 +347,69 @@ main { display: flex; flex-direction: column; gap: var(--bt-space-3); }
 .splash-logo path:nth-child(6) { animation-delay: 0.6s; }
 @keyframes bt-draw { to { stroke-dashoffset: 0; } }
 .splash-title { margin-top: var(--bt-space-3); font: 800 2.75rem/1 var(--bt-font); letter-spacing: -0.03em; }
-.splash-tagline { margin-top: var(--bt-space-1); font: var(--bt-h2); color: var(--bt-yellow); }
-.splash-status { margin-top: var(--bt-space-4); color: var(--bt-soft); }
+.splash-tagline {
+  margin-top: var(--bt-space-2); padding: 4px 12px; border-radius: 8px;
+  font: var(--bt-h2); background: var(--bt-yellow); color: var(--bt-ink);
+}
+.splash-status { margin-top: var(--bt-space-4); color: var(--bt-text-soft); }
 .splash-skip { display: inline-flex; align-items: center; min-height: 44px; margin-top: var(--bt-space-1); font-weight: 700; text-underline-offset: 4px; }
 
-/* ---------- Home ---------- */
+
+/* ---------- 11. Home page ---------- */
 .greeting { font: var(--bt-h1); }
 
-.reclaimed { display: flex; flex-direction: column; gap: var(--bt-space-1); }
-.reclaimed-sub { color: var(--bt-soft); }
+/* Reclaimed total: black board panel so the yellow number stays readable */
+.reclaimed {
+  display: flex; flex-direction: column; gap: var(--bt-space-1);
+  padding: var(--bt-space-3); border-radius: var(--bt-radius-card);
+  background: var(--bt-board-bg); color: var(--bt-board-text);
+}
+.reclaimed .bt-kicker { color: var(--bt-board-soft); }
+.reclaimed-sub { color: var(--bt-board-soft); }
 .reclaimed-coming { color: var(--bt-yellow); font-weight: 700; }
+.reclaimed + .bt-rule { display: none; } /* the panel already separates it */
 
+/* Line status */
 .section-kicker { margin-bottom: 12px; }
 .line-status { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--bt-space-1); }
 .line-row {
-  display: flex; align-items: center; gap: 12px; min-height: 56px;
-  padding: 10px var(--bt-space-2); background: var(--bt-surface); border-radius: var(--bt-radius-card);
+  display: flex; align-items: center; gap: 12px; min-height: 60px;
+  padding: 10px var(--bt-space-2); background: var(--bt-card);
+  border: 1.5px solid var(--bt-edge); border-radius: var(--bt-radius-card);
 }
 .line-name { flex: 1; font-weight: 700; }
 .line-state { font: var(--bt-small); font-weight: 700; }
-.line-state.is-ok { color: var(--bt-soft); }
-.line-state.is-bad { color: var(--bt-red); }
+.line-state.is-ok { color: var(--bt-text-soft); }
+.line-state.is-bad { color: var(--bt-bad-text); }
 
+/* Recent journeys */
 .section-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
 .section-head h2 { font: var(--bt-h2); }
 .journey-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
-.journey { display: flex; align-items: center; gap: 12px; min-height: 72px; padding: 14px var(--bt-space-2); }
+.journey { display: flex; align-items: center; gap: 12px; min-height: 76px; padding: 14px var(--bt-space-2); }
 .journey-main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
 .journey-route { font-weight: 700; }
-.journey-meta { font: var(--bt-small); color: var(--bt-ink-soft); }
+.journey-meta { font: var(--bt-small); color: var(--bt-text-soft); }
 
+/* Pot */
 .pot-card { display: flex; flex-direction: column; gap: 12px; }
 .pot-top { display: flex; align-items: center; gap: 12px; }
 .pot-names { display: flex; flex-direction: column; }
 .pot-name { font-weight: 700; }
 .pot-amount { font: 800 2rem/1 var(--bt-font); letter-spacing: -0.02em; }
-.pot-target { font: var(--bt-body); color: var(--bt-ink-soft); letter-spacing: 0; }
+.pot-target { font: var(--bt-body); color: var(--bt-text-soft); letter-spacing: 0; }
 .pot-bar { display: block; height: 14px; border-radius: var(--bt-radius-pill); border: 2px solid var(--bt-ink); overflow: hidden; }
 .pot-fill { display: block; height: 100%; background: var(--bt-pink); }
 
-/* ---------- Placeholder pages ---------- */
+
+/* ---------- 12. Placeholder pages ---------- */
 .placeholder-title { font: var(--bt-h2); margin-bottom: 4px; }
 
-/* ---------- Respect "reduce motion": show end states instantly ---------- */
+
+/* ---------- 13. Reduced motion: show end states instantly ---------- */
 @media (prefers-reduced-motion: reduce) {
-  .page.is-entering { animation: none; }
+  .page.is-entering, .bt-menu[open] { animation: none; }
   .splash-logo path { animation: none; stroke-dashoffset: 0; }
+  a.bt-sign, .bt-switch-knob, .bt-toast { transition: none; }
+  a.bt-sign:active { transform: none; }
 }

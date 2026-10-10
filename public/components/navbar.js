@@ -28,7 +28,7 @@
       box.setAttribute('role', 'status');
     }
     // An open menu sits above everything else, so show the message inside it when it's open.
-    (document.querySelector('dialog[open]') || document.body).append(box);
+    (document.querySelector('dialog[open]') || document.getElementById('phone') || document.body).append(box);
     box.textContent = message;
     box.classList.add('is-visible');
     clearTimeout(box.hideTimer);

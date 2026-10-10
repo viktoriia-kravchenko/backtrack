@@ -19,10 +19,14 @@ const routes = {
 };
 
 // The top bar is in index.html. The navbar and menu are created once and stay between pages.
+// The navbar goes inside the phone, after the scrolling screen, so it sits at the bottom.
+const phone = document.getElementById('phone');
+const screen = document.getElementById('screen');
 const topbar = document.getElementById('topbar');
 const menu = Backtrack.createMenu();
 const navbar = Backtrack.createNavbar();
-document.body.append(navbar, menu.element);
+phone.append(navbar);
+document.body.append(menu.element);
 
 const app = document.getElementById('app');
 let firstRender = true;
@@ -52,7 +56,7 @@ function render() {
       heading.tabIndex = -1;
       heading.focus({ preventScroll: true });
     }
-    window.scrollTo(0, 0);
+    screen.scrollTo(0, 0); // only the inside of the phone scrolls
   }
   firstRender = false;
 }
