@@ -63,7 +63,7 @@ test('serves the banking app page', async () => {
 
 test('draft is prefilled from bank data and picks the disrupted journey', async () => {
   const draft = await draftForTravelDay(2);
-  assert.equal(draft.prefill.customer.name, 'Alex Morgan');
+  assert.equal(draft.prefill.customer.name, 'Lena Oxton');
   assert.equal(draft.prefill.payment.card, 'Visa Debit •••• 4821');
   assert.equal(JSON.stringify(draft).includes('tok_'), false, 'card token must not reach the browser');
   assert.equal(draft.prefill.journey.travelDate, daysAgo(2));

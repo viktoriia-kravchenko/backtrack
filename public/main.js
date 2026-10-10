@@ -1,19 +1,22 @@
 // Router: shows the page that matches the URL after the #.
 //   /            → loading screen, then Home
 //   #/home       → Home
-//   #/journeys   → Journeys (placeholder for now)
+//   #/journeys   → Journeys list
+//   #/journey/j1 → Refund page for journey j1
 //
 // To add a page: create pages/<name>.js, import it here, add it to `routes`,
 // and add its file to STATIC_FILES in bank/server.js.
 import loadingPage from './pages/loading.js';
 import homePage from './pages/home.js';
+import journeysPage from './pages/journeys.js';
+import refundPage from './pages/refund.js';
 import placeholderPage from './pages/placeholder.js';
 
 const routes = {
   loading: loadingPage,
   home: homePage,
-  journeys: placeholderPage('Journeys', 'journeys'),
-  journey: placeholderPage('Refund details', 'journeys'),
+  journeys: journeysPage,
+  journey: refundPage, // #/journey/j1 opens the refund page for journey j1
   pot: placeholderPage('Pot', 'pot'),
   network: placeholderPage('Network', 'network'),
 };
@@ -32,7 +35,8 @@ const app = document.getElementById('app');
 let firstRender = true;
 
 function render() {
-  const [name = 'loading', id] = location.hash.replace(/^#\/?/, '').split('/');
+  const [hashName, id] = location.hash.replace(/^#\/?/, '').split('/');
+  const name = hashName || 'loading'; // no # in the URL → start on the welcome screen
   const page = routes[name] || routes.home;
 
   app.innerHTML = page.render(id);

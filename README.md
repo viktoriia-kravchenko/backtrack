@@ -65,7 +65,7 @@ Headers: `Authorization: Bearer <partner key>`, `Idempotency-Key: <unique per cl
 ```json
 {
   "partnerReference": "drf_…",
-  "customer": { "name": "Alex Morgan", "email": "alex.morgan@example.com" },
+  "customer": { "name": "Lena Oxton", "email": "lena.oxton@example.com" },
   "payment": { "method": "contactless", "cardToken": "tok_…", "last4": "4821" },
   "journey": {
     "travelDate": "2026-10-08", "line": "victoria",

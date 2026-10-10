@@ -15,10 +15,12 @@
      7. Bottom tab bar
      8. Menu
      9. Toast
-    10. Loading screen
+    10. Welcome screen
     11. Home page
-    12. Placeholder pages
-    13. Reduced motion
+    12. Journeys page
+    13. Refund page (and the claim screen)
+    14. Placeholder pages
+    15. Reduced motion
    ===================================================================== */
 
 
@@ -33,10 +35,9 @@
   --bt-bad-text: #C42B22;     /* "Severe delays" etc. Darker than --bt-red so it's readable as text */
   --bt-focus: #000000;        /* keyboard focus outline */
 
-  /* The black "departure board" panel behind the big money number */
-  --bt-board-bg: #000000;
-  --bt-board-text: #FFFFFF;
-  --bt-board-soft: #CFCFCF;
+  /* The overview card at the top of Home */
+  --bt-overview-bg: #FFF4CC;    /* soft yellow */
+  --bt-overview-edge: #F0DC8C;  /* its outline */
 
   /* Fixed colours used on top of yellow, green etc. */
   --bt-ink: #000000;
@@ -227,11 +228,14 @@ a.bt-sign:active { transform: scale(0.98); }
 /* Sign rule: a thick line between sections */
 .bt-rule { height: 3px; margin: 0; border: 0; background: var(--bt-text); }
 
-/* Buttons and links */
+/* Buttons: work on <button> and on <a> links styled as buttons */
 .bt-btn {
-  min-block-size: 52px; padding: 0 var(--bt-space-3); border-radius: 14px; border: 0; cursor: pointer;
-  font: 700 1rem/1 var(--bt-font); background: var(--bt-yellow); color: var(--bt-ink);
+  display: flex; align-items: center; justify-content: center;
+  min-block-size: 56px; padding: 0 var(--bt-space-3); border-radius: 14px; border: 0; cursor: pointer;
+  font: 700 1.0625rem/1 var(--bt-font); text-decoration: none;
+  background: var(--bt-yellow); color: var(--bt-ink);
 }
+.bt-btn:active { transform: scale(0.98); }
 .bt-btn--ghost { background: transparent; color: var(--bt-text); border: 2px solid var(--bt-text); }
 .text-link {
   display: inline-flex; align-items: center; min-height: 44px;
@@ -330,11 +334,13 @@ a.bt-sign:active { transform: scale(0.98); }
 .bt-toast.is-visible { opacity: 1; }
 
 
-/* ---------- 10. Loading screen ---------- */
+/* ---------- 10. Welcome screen ---------- */
+/* Fills the phone: logo in the middle, buttons at the bottom */
 .splash {
-  min-height: calc(var(--phone-height) - var(--bt-bezel) * 2 - 48px); display: flex; flex-direction: column;
-  align-items: center; justify-content: center; text-align: center;
+  min-height: calc(var(--phone-height) - var(--bt-bezel) * 2 - var(--bt-space-1) - var(--bt-space-4));
+  display: flex; flex-direction: column; text-align: center;
 }
+.splash-brand { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
 .splash-logo { width: 140px; height: 100px; }
 .splash-logo path {
   fill: none; stroke-width: 7; stroke-linecap: round;
@@ -351,23 +357,57 @@ a.bt-sign:active { transform: scale(0.98); }
   margin-top: var(--bt-space-2); padding: 4px 12px; border-radius: 8px;
   font: var(--bt-h2); background: var(--bt-yellow); color: var(--bt-ink);
 }
-.splash-status { margin-top: var(--bt-space-4); color: var(--bt-text-soft); }
-.splash-skip { display: inline-flex; align-items: center; min-height: 44px; margin-top: var(--bt-space-1); font-weight: 700; text-underline-offset: 4px; }
+
+/* Sign up and Log in: fade in once the logo has drawn */
+.splash-actions {
+  display: flex; flex-direction: column; gap: 12px;
+  padding-top: var(--bt-space-3);
+  opacity: 0; animation: bt-appear var(--bt-slow) var(--bt-ease) 1.1s forwards;
+}
+@keyframes bt-appear { to { opacity: 1; } }
 
 
 /* ---------- 11. Home page ---------- */
-.greeting { font: var(--bt-h1); }
 
-/* Reclaimed total: black board panel so the yellow number stays readable */
-.reclaimed {
-  display: flex; flex-direction: column; gap: var(--bt-space-1);
-  padding: var(--bt-space-3); border-radius: var(--bt-radius-card);
-  background: var(--bt-board-bg); color: var(--bt-board-text);
+/* Overview card: soft yellow, black text */
+.overview {
+  display: flex; flex-direction: column; gap: var(--bt-space-2);
+  padding: 20px; border-radius: var(--bt-radius-card);
+  background: var(--bt-overview-bg); color: var(--bt-ink);
+  border: 1.5px solid var(--bt-overview-edge);
 }
-.reclaimed .bt-kicker { color: var(--bt-board-soft); }
-.reclaimed-sub { color: var(--bt-board-soft); }
-.reclaimed-coming { color: var(--bt-yellow); font-weight: 700; }
-.reclaimed + .bt-rule { display: none; } /* the panel already separates it */
+.overview-top { display: flex; align-items: center; gap: 12px; }
+.overview-avatar {
+  flex: none; width: 44px; height: 44px; border-radius: 50%;
+  display: grid; place-items: center;
+  background: var(--bt-ink); color: var(--bt-white); font-weight: 700; font-size: 1.125rem;
+}
+.overview-greeting { font: 700 1.375rem/1.2 var(--bt-font); }
+.overview-date { font: var(--bt-small); color: var(--bt-text-soft); }
+
+/* "Do I need to do anything?" line */
+.overview-status {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; border-radius: 12px;
+  background: var(--bt-white); font: var(--bt-small); font-weight: 700;
+}
+.overview-status-icon {
+  flex: none; width: 24px; height: 24px; border-radius: 50%;
+  display: grid; place-items: center;
+  background: var(--bt-green); color: var(--bt-ink); font-size: 0.8125rem;
+}
+
+.overview-label { font: var(--bt-small); font-weight: 700; color: var(--bt-text-soft); }
+.overview-amount { font: 800 3rem/1.05 var(--bt-font); letter-spacing: -0.03em; }
+
+/* Three small stats in a row, split by thin lines */
+.overview-stats {
+  margin: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-top: 1.5px solid var(--bt-overview-edge); padding-top: 14px;
+}
+.overview-stats div + div { border-left: 1.5px solid var(--bt-overview-edge); padding-left: 12px; }
+.overview-stats dt { font: var(--bt-small); color: var(--bt-text-soft); }
+.overview-stats dd { margin: 2px 0 0; font: 700 1.125rem/1.2 var(--bt-font); }
 
 /* Line status */
 .section-kicker { margin-bottom: 12px; }
@@ -402,14 +442,182 @@ a.bt-sign:active { transform: scale(0.98); }
 .pot-fill { display: block; height: 100%; background: var(--bt-pink); }
 
 
-/* ---------- 12. Placeholder pages ---------- */
+/* ---------- 12. Journeys page ---------- */
+.page-head { display: flex; flex-direction: column; gap: 4px; }
+.page-intro { color: var(--bt-text-soft); }
+
+/* Totals: three numbers in a white card */
+.journeys-summary {
+  margin: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+  padding: 16px; border-radius: var(--bt-radius-card);
+  background: var(--bt-card); border: 1.5px solid var(--bt-edge);
+}
+.journeys-summary div + div { border-left: 1.5px solid var(--bt-edge); padding-left: 12px; }
+.journeys-summary dt { font: var(--bt-small); color: var(--bt-text-soft); }
+.journeys-summary dd { margin: 2px 0 0; font: 700 1.25rem/1.2 var(--bt-font); }
+
+/* Filter chips: a row you can scroll sideways */
+.bt-chips {
+  display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none;
+  margin: 0 calc(var(--bt-gutter) * -1); padding: 2px var(--bt-gutter);
+}
+.bt-chips::-webkit-scrollbar { display: none; }
+.bt-chip {
+  flex: none; display: inline-flex; align-items: center; gap: 8px;
+  min-height: 44px; padding: 0 16px; border-radius: var(--bt-radius-pill); cursor: pointer;
+  background: var(--bt-card); color: var(--bt-text); border: 1.5px solid var(--bt-edge);
+  font: var(--bt-small); font-weight: 700;
+}
+.bt-chip-count {
+  min-width: 22px; padding: 1px 7px; border-radius: var(--bt-radius-pill);
+  background: var(--bt-bg); font-size: 0.8125rem;
+}
+/* Selected chip: dark fill, so it doesn't rely on colour alone (it's also announced as "pressed") */
+.bt-chip[aria-pressed="true"] { background: var(--bt-ink); color: var(--bt-white); border-color: var(--bt-ink); }
+.bt-chip[aria-pressed="true"] .bt-chip-count { background: var(--bt-yellow); color: var(--bt-ink); }
+
+/* The list */
+.journeys-results { display: flex; flex-direction: column; gap: var(--bt-space-3); }
+.journey-card { display: flex; flex-direction: column; gap: 4px; padding: 14px var(--bt-space-2); }
+.journey-card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.journey-note {
+  margin-top: 6px; padding-top: 8px; border-top: 1px solid var(--bt-edge);
+  font: var(--bt-small); color: var(--bt-ink);
+}
+.bt-pill[data-status="ontime"] { background: var(--bt-bg); color: var(--bt-text-soft); }
+.journeys-empty { padding: var(--bt-space-3) 0; text-align: center; color: var(--bt-text-soft); }
+
+
+/* ---------- 13. Refund page (and the claim screen) ---------- */
+.back-link {
+  align-self: flex-start; display: inline-flex; align-items: center; min-height: 44px; margin-bottom: -8px;
+  font-weight: 700; text-decoration: none; color: var(--bt-text);
+}
+.refund-title { font: var(--bt-h1); }
+
+/* "Do I need to do anything?" box */
+.refund-headline {
+  display: flex; gap: 12px; align-items: flex-start;
+  padding: 16px; border-radius: var(--bt-radius-card); border: 1.5px solid var(--bt-edge);
+  background: var(--bt-card);
+}
+.refund-headline strong { display: block; font: 700 1.0625rem/1.3 var(--bt-font); }
+.refund-headline-body { display: block; margin-top: 4px; color: var(--bt-text-soft); }
+.refund-headline-icon {
+  flex: none; width: 32px; height: 32px; border-radius: 50%;
+  display: grid; place-items: center; font-weight: 700; color: var(--bt-ink);
+}
+.refund-headline.is-wait { background: var(--bt-overview-bg); border-color: var(--bt-overview-edge); }
+.refund-headline.is-wait .refund-headline-icon { background: var(--bt-yellow); }
+.refund-headline.is-good .refund-headline-icon { background: var(--bt-green); }
+.refund-headline.is-none .refund-headline-icon { background: var(--bt-bg); border: 1.5px solid var(--bt-ink); }
+
+/* White cards on this page */
+.refund-card {
+  padding: 18px var(--bt-space-2); border-radius: var(--bt-radius-card);
+  background: var(--bt-card); border: 1.5px solid var(--bt-edge);
+}
+.refund-card-title { font: var(--bt-h2); margin-bottom: 14px; }
+
+/* Usual vs this time bars. The minutes are always written out too. */
+.delay-row { display: grid; grid-template-columns: 76px 1fr 56px; align-items: center; gap: 10px; margin-bottom: 10px; }
+.delay-label { font: var(--bt-small); color: var(--bt-text-soft); }
+.delay-value { text-align: right; font-weight: 700; }
+.delay-track { height: 14px; border-radius: var(--bt-radius-pill); background: var(--bt-bg); }
+.delay-bar { display: block; height: 100%; border-radius: var(--bt-radius-pill); }
+.delay-bar.is-usual { background: var(--bt-text-soft); }
+.delay-bar.is-yours { background: var(--bt-yellow); box-shadow: inset 0 0 0 1.5px var(--bt-ink); }
+.delay-summary { margin-top: 4px; }
+
+/* The refund as a route line: Delayed → Checked → Claimed → Paid → Saved */
+.route { list-style: none; margin: 0; padding: 0; }
+.route-stop { position: relative; display: flex; gap: 14px; padding-bottom: 20px; }
+.route-stop:last-child { padding-bottom: 0; }
+.route-stop::before { /* the line down to the next stop */
+  content: ''; position: absolute; left: 12px; top: 26px; bottom: 0; width: 4px; background: var(--bt-edge);
+}
+.route-stop:last-child::before { display: none; }
+.route-stop.is-done::before { background: var(--bt-ink); }
+.route-dot {
+  flex: none; position: relative; z-index: 1; width: 28px; height: 28px; border-radius: 50%;
+  display: grid; place-items: center; font-size: 0.875rem; font-weight: 700;
+  background: var(--bt-card); border: 3px solid var(--bt-edge);
+}
+.route-stop.is-done .route-dot { background: var(--bt-ink); border-color: var(--bt-ink); color: var(--bt-white); }
+.route-stop.is-current .route-dot { border-color: var(--bt-ink); box-shadow: 0 0 0 4px var(--bt-yellow); }
+.route-stop.is-stopped .route-dot { background: var(--bt-red); border-color: var(--bt-ink); color: var(--bt-ink); }
+.route-text { display: flex; flex-direction: column; padding-top: 3px; }
+.route-title { font-weight: 700; }
+.route-stop.is-todo .route-title { color: var(--bt-text-soft); }
+.route-now {
+  margin-left: 6px; padding: 1px 8px; border-radius: var(--bt-radius-pill);
+  background: var(--bt-yellow); color: var(--bt-ink); font: var(--bt-small); font-weight: 700;
+}
+.route-detail { font: var(--bt-small); color: var(--bt-text-soft); }
+
+/* "What counts for a refund?" (opens when tapped) */
+.refund-rules summary { min-height: 44px; display: flex; align-items: center; font-weight: 700; cursor: pointer; }
+.refund-rules p { margin-top: 8px; color: var(--bt-text-soft); }
+
+/* Money bar at the end of the page */
+.refund-money {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 14px 16px; border-radius: var(--bt-radius-card);
+  background: var(--bt-card); border: 2px solid var(--bt-ink);
+}
+.refund-amount { display: block; font: 800 1.75rem/1 var(--bt-font); letter-spacing: -0.02em; }
+.refund-money-sub { display: block; margin-top: 4px; font: var(--bt-small); color: var(--bt-text-soft); }
+.refund-money-btn { min-block-size: 48px; flex: none; }
+
+/* Claim screen: "Checked for you" list */
+.claim-checks { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.claim-checks li { display: flex; align-items: flex-start; gap: 10px; }
+.claim-tick {
+  flex: none; width: 24px; height: 24px; border-radius: 50%;
+  display: grid; place-items: center; font-size: 0.8125rem; font-weight: 700;
+  background: var(--bt-green); color: var(--bt-ink);
+}
+
+/* Claim screen: pick a pot (real radio buttons, so keyboards and screen readers work) */
+.claim-form { display: flex; flex-direction: column; gap: var(--bt-space-2); }
+.pot-picker { margin: 0; padding: 0; border: 0; min-width: 0; }
+.pot-picker legend { padding: 0; }
+.pot-options { display: flex; flex-direction: column; gap: 8px; }
+.pot-option {
+  display: flex; align-items: center; gap: 12px; min-height: 64px; padding: 10px 14px;
+  border-radius: 16px; border: 1.5px solid var(--bt-edge); background: var(--bt-card); cursor: pointer;
+}
+.pot-option input { order: 3; flex: none; width: 22px; height: 22px; margin: 0; accent-color: var(--bt-ink); }
+.pot-option-text { flex: 1; display: flex; flex-direction: column; }
+.pot-option-name { font-weight: 700; }
+.pot-option-note { font: var(--bt-small); color: var(--bt-text-soft); }
+/* The chosen pot: thicker dark border and a soft yellow fill, plus the filled radio */
+.pot-option:has(input:checked) { border: 2px solid var(--bt-ink); background: var(--bt-overview-bg); }
+.pot-option:has(input:focus-visible) { outline: 3px solid var(--bt-focus); outline-offset: 2px; }
+
+/* Claim screen: agree and send */
+.claim-consent {
+  display: flex; align-items: flex-start; gap: 12px; padding: 14px 16px; cursor: pointer;
+  border-radius: 16px; background: var(--bt-card); border: 1.5px solid var(--bt-edge);
+}
+.claim-consent input { flex: none; width: 24px; height: 24px; margin: 0; accent-color: var(--bt-ink); }
+.claim-error { color: var(--bt-bad-text); font-weight: 700; }
+.claim-error::before { content: '! '; }
+.claim-submit { width: 100%; }
+.claim-small { text-align: center; font: var(--bt-small); color: var(--bt-text-soft); }
+
+
+/* ---------- 14. Placeholder pages ---------- */
+.greeting { font: var(--bt-h1); }
 .placeholder-title { font: var(--bt-h2); margin-bottom: 4px; }
 
 
-/* ---------- 13. Reduced motion: show end states instantly ---------- */
+/* ---------- 15. Reduced motion: show end states instantly ---------- */
 @media (prefers-reduced-motion: reduce) {
   .page.is-entering, .bt-menu[open] { animation: none; }
   .splash-logo path { animation: none; stroke-dashoffset: 0; }
+  .splash-actions { animation: none; opacity: 1; }
+  .bt-btn:active { transform: none; }
   a.bt-sign, .bt-switch-knob, .bt-toast { transition: none; }
   a.bt-sign:active { transform: none; }
 }

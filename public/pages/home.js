@@ -1,52 +1,62 @@
-// Home page. Built from `homeData`.
+// Home page. Built from `homeData` plus the shared journeys and pots in data.js.
 // The data is hard-coded for now. Later it comes from GET /summary, /status and /journeys.
+import { journeys, pots, STATUS, money, esc } from '../data.js';
 
 const homeData = {
-  firstName: 'Alex',
+  firstName: 'Lena',
   reclaimed: { year: 46.2, month: 8.4, count: 14, onItsWay: 2.8 },
   lines: [
     { name: 'Central', letter: 'C', status: 'Severe delays', ok: false },
     { name: 'Elizabeth', letter: 'E', status: 'Good service', ok: true },
   ],
-  journeys: [
-    { id: 'j1', route: 'Bank → Stratford', meta: 'Central · 41 min, usually 17', status: 'eligible', amount: 2.8 },
-    { id: 'j2', route: 'Liverpool St → Farringdon', meta: 'Elizabeth · 38 min, usually 4', status: 'paid', amount: 2.8 },
-    { id: 'j3', route: "King's Cross, no tap out", meta: 'Incomplete journey · max fare charged', status: 'paid', amount: 5.2 },
-    { id: 'j4', route: 'Canning Town → Bank', meta: "DLR · strike is outside TfL's control", status: 'none' },
-  ],
-  pot: { name: 'Treat Yourself', goal: 'Weekend in Brighton', saved: 36.96, target: 150 },
-};
-
-// Each status has a word (never colour alone) and a line colour for the card's top strip.
-const STATUS = {
-  eligible: { label: 'Eligible', line: '--bt-yellow' },
-  claimed: { label: 'Claimed', line: '--bt-orange' },
-  paid: { label: 'Paid', line: '--bt-green' },
-  none: { label: 'Not eligible', line: '--bt-red' },
 };
 
 // ---------- helpers ----------
 
-const money = (n) => `£${n.toFixed(2)}`;
-
-// Makes text safe to put inside HTML. Matters once data comes from the server.
-const esc = (text) => String(text).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-
 function greeting() {
   const hour = new Date().getHours();
-  if (hour < 12) return 'Morning';
-  if (hour < 18) return 'Afternoon';
-  return 'Evening';
+  if (hour < 12) return 'Good morning';
+  if (hour < 18) return 'Good afternoon';
+  return 'Good evening';
+}
+
+// e.g. "Saturday 10 October"
+function today() {
+  return new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
 }
 
 // ---------- sections ----------
 
-function reclaimedHtml({ reclaimed }) {
-  return `<section class="reclaimed" aria-labelledby="reclaimed-label">
-    <p id="reclaimed-label" class="bt-kicker">Reclaimed this year</p>
-    <p class="bt-board">${money(reclaimed.year)}</p>
-    <p class="reclaimed-sub">${money(reclaimed.month)} this month · ${reclaimed.count} refunds</p>
-    <p class="reclaimed-coming">${money(reclaimed.onItsWay)} on its way</p>
+// Overview card: greeting, a one-line "do I need to do anything?", the total, then 3 small stats.
+function overviewHtml({ firstName, reclaimed }) {
+  const status = reclaimed.onItsWay > 0
+    ? `${money(reclaimed.onItsWay)} is on its way to you. Nothing for you to do.`
+    : 'Nothing for you to do today.';
+
+  return `<section class="overview" aria-labelledby="overview-greeting">
+    <div class="overview-top">
+      <span class="overview-avatar" aria-hidden="true">${esc(firstName[0])}</span>
+      <div>
+        <h1 id="overview-greeting" class="overview-greeting">${greeting()}, ${esc(firstName)}</h1>
+        <p class="overview-date">${today()}</p>
+      </div>
+    </div>
+
+    <p class="overview-status">
+      <span class="overview-status-icon" aria-hidden="true">✓</span>
+      ${status}
+    </p>
+
+    <div class="overview-total">
+      <p class="overview-label">Reclaimed this year</p>
+      <p class="overview-amount">${money(reclaimed.year)}</p>
+    </div>
+
+    <dl class="overview-stats">
+      <div><dt>This month</dt><dd>${money(reclaimed.month)}</dd></div>
+      <div><dt>Refunds</dt><dd>${reclaimed.count}</dd></div>
+      <div><dt>On its way</dt><dd>${money(reclaimed.onItsWay)}</dd></div>
+    </dl>
   </section>`;
 }
 
@@ -71,12 +81,14 @@ function pillHtml(journey) {
 }
 
 // One station-sign card per journey. The top strip colour matches its status.
-function journeysHtml({ journeys }) {
-  const cards = journeys.map((j) => `<li>
+function journeysHtml() {
+  // The 4 most recent journeys that had a delay (on-time trips are on the Journeys page)
+  const recent = journeys.filter((j) => j.status !== 'ontime').slice(0, 4);
+  const cards = recent.map((j) => `<li>
       <a class="bt-sign journey" href="#/journey/${esc(j.id)}" style="--line: var(${STATUS[j.status].line})">
         <span class="journey-main">
           <span class="journey-route">${esc(j.route)}</span>
-          <span class="journey-meta">${esc(j.meta)}</span>
+          <span class="journey-meta">${esc(j.mins == null ? 'Incomplete journey · max fare charged' : `${j.line} · ${j.mins} min, usually ${j.usual}`)}</span>
         </span>
         ${pillHtml(j)}
       </a>
@@ -91,7 +103,8 @@ function journeysHtml({ journeys }) {
   </section>`;
 }
 
-function potHtml({ pot }) {
+function potHtml() {
+  const pot = pots[0];
   const percent = Math.round((pot.saved / pot.target) * 100);
   return `<section aria-labelledby="pot-heading">
     <a class="bt-sign pot-card" href="#/pot" style="--line: var(--bt-pink)">
@@ -118,12 +131,10 @@ export default {
 
   render() {
     return `<main>
-        <h1 class="greeting">${greeting()}, ${esc(homeData.firstName)}</h1>
-        ${reclaimedHtml(homeData)}
-        <hr class="bt-rule">
+        ${overviewHtml(homeData)}
         ${linesHtml(homeData)}
-        ${journeysHtml(homeData)}
-        ${potHtml(homeData)}
+        ${journeysHtml()}
+        ${potHtml()}
       </main>`;
   },
 };

@@ -39,7 +39,7 @@ function createStore() {
   transactions.sort((a, b) => b.postedDate.localeCompare(a.postedDate));
 
   return {
-    profile: { id: 'cus_001', name: 'Alex Morgan', email: 'alex.morgan@example.com' },
+    profile: { id: 'cus_001', name: 'Lena Oxton', email: 'lena.oxton@example.com' },
     // The bank stores a token from its card processor. The card number never leaves the bank.
     cards: [{ id: 'card_main', label: 'Visa Debit', last4: '4821', token: 'tok_card_7f3a9c21e4' }],
     // Journeys the customer saved (or the app learned from their location history, with consent).
