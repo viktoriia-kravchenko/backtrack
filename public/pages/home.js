@@ -1,3 +1,6 @@
+import { JOURNEYS } from '../journeys.js';
+import { potForJourney } from '../pots-store.js';
+
 // Home page. Built from `homeData`.
 // The data is hard-coded for now. Later it comes from GET /summary, /status and /journeys.
 
@@ -8,13 +11,7 @@ const homeData = {
     { name: 'Central', letter: 'C', status: 'Severe delays', ok: false },
     { name: 'Elizabeth', letter: 'E', status: 'Good service', ok: true },
   ],
-  journeys: [
-    { id: 'j1', route: 'Bank → Stratford', meta: 'Central · 41 min, usually 17', status: 'eligible', amount: 2.8 },
-    { id: 'j2', route: 'Liverpool St → Farringdon', meta: 'Elizabeth · 38 min, usually 4', status: 'paid', amount: 2.8 },
-    { id: 'j3', route: "King's Cross, no tap out", meta: 'Incomplete journey · max fare charged', status: 'paid', amount: 5.2 },
-    { id: 'j4', route: 'Canning Town → Bank', meta: "DLR · strike is outside TfL's control", status: 'none' },
-  ],
-  pot: { name: 'Treat Yourself', goal: 'Weekend in Brighton', saved: 36.96, target: 150 },
+  journeys: JOURNEYS,
 };
 
 // Each status has a word (never colour alone) and a line colour for the card's top strip.
@@ -71,8 +68,11 @@ function pillHtml(journey) {
 }
 
 // One station-sign card per journey. The top strip colour matches its status.
-function journeysHtml({ journeys }) {
-  const cards = journeys.map((j) => `<li>
+// A journey refunded into a pot takes the pot's look instead: its colour, name and description.
+function journeyCardHtml(j) {
+  const pot = potForJourney(j.id);
+  if (!pot) {
+    return `<li>
       <a class="bt-sign journey" href="#/journey/${esc(j.id)}" style="--line: var(${STATUS[j.status].line})">
         <span class="journey-main">
           <span class="journey-route">${esc(j.route)}</span>
@@ -80,7 +80,23 @@ function journeysHtml({ journeys }) {
         </span>
         ${pillHtml(j)}
       </a>
-    </li>`).join('');
+    </li>`;
+  }
+  return `<li>
+      <a class="bt-sign journey journey--pot" href="#/pots/${esc(pot.id)}" style="--line: var(${pot.line})">
+        <span class="bt-bullet" aria-hidden="true" style="--line: var(${pot.line})">${esc(pot.letter)}</span>
+        <span class="journey-main">
+          <span class="pot-name">${esc(pot.name)}</span>
+          ${pot.description ? `<span class="journey-meta">${esc(pot.description)}</span>` : ''}
+          <span class="journey-meta journey-via">${esc(j.route)}</span>
+        </span>
+        ${pillHtml(j)}
+      </a>
+    </li>`;
+}
+
+function journeysHtml({ journeys }) {
+  const cards = journeys.map(journeyCardHtml).join('');
 
   return `<section aria-labelledby="journeys-heading">
     <div class="section-head">
@@ -88,25 +104,6 @@ function journeysHtml({ journeys }) {
       <a class="text-link" href="#/journeys">All refunds</a>
     </div>
     <ul class="journey-list">${cards}</ul>
-  </section>`;
-}
-
-function potHtml({ pot }) {
-  const percent = Math.round((pot.saved / pot.target) * 100);
-  return `<section aria-labelledby="pot-heading">
-    <a class="bt-sign pot-card" href="#/pot" style="--line: var(--bt-pink)">
-      <span class="pot-top">
-        <span class="bt-bullet" aria-hidden="true" style="--line: var(--bt-pink)">T</span>
-        <span class="pot-names">
-          <span id="pot-heading" class="pot-name">${esc(pot.name)}</span>
-          <span class="journey-meta">${esc(pot.goal)}</span>
-        </span>
-      </span>
-      <span class="pot-amount">${money(pot.saved)} <span class="pot-target">of ${money(pot.target)}</span></span>
-      <span class="pot-bar" role="progressbar" aria-label="Progress to goal" aria-valuenow="${percent}" aria-valuemin="0" aria-valuemax="100">
-        <span class="pot-fill" style="width: ${percent}%"></span>
-      </span>
-    </a>
   </section>`;
 }
 
@@ -123,7 +120,6 @@ export default {
         <hr class="bt-rule">
         ${linesHtml(homeData)}
         ${journeysHtml(homeData)}
-        ${potHtml(homeData)}
       </main>`;
   },
 };
