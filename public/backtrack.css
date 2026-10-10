@@ -1,0 +1,200 @@
+/* Backtrack styles: design tokens, shared components, loading screen, home page.
+   Use the variables everywhere; don't hard-code hex values in components. */
+
+/* ---------- Design tokens (from the design brief) ---------- */
+:root {
+  /* Ground and ink */
+  --bt-black: #000000;        /* app background */
+  --bt-surface: #111111;      /* raised panels on black */
+  --bt-white: #FFFFFF;        /* primary text, sign cards */
+  --bt-ink: #000000;          /* text on white or yellow */
+  --bt-ink-soft: #4A4A4A;     /* secondary text on white (added: 8.9:1 contrast) */
+  --bt-soft: #CFCFCF;         /* secondary text on black */
+  --bt-dim: #8A8A8A;          /* labels, captions */
+  --bt-rule: #FFFFFF;         /* sign rules */
+
+  /* Line colours */
+  --bt-yellow: #FFD02F;       /* hero: money, active, primary CTA */
+  --bt-orange: #FF6A1A;       /* claims in progress */
+  --bt-red: #F2453D;          /* problems, not eligible */
+  --bt-pink: #FF52B4;         /* Treat Yourself pot */
+  --bt-blue: #2F7BF5;         /* Engine / bank actions */
+  --bt-green: #4FD44F;        /* paid, saved, savings pot */
+
+  /* Type */
+  --bt-font: "Inter", "Helvetica Neue", Arial, sans-serif;
+  --bt-mono: "JetBrains Mono", ui-monospace, monospace;
+  --bt-display: 800 3.5rem/1.0 var(--bt-font);   /* big amounts */
+  --bt-h1: 700 2rem/1.1 var(--bt-font);
+  --bt-h2: 700 1.25rem/1.2 var(--bt-font);
+  --bt-body: 500 1rem/1.45 var(--bt-font);
+  --bt-small: 500 0.875rem/1.4 var(--bt-font);
+  --bt-kicker: 700 0.75rem/1 var(--bt-font);     /* UPPERCASE, 0.18em tracking */
+
+  /* Shape and space (8 px grid) */
+  --bt-radius-card: 16px;
+  --bt-radius-pill: 999px;
+  --bt-strip: 8px;            /* coloured top strip on sign cards */
+  --bt-space-1: 8px;
+  --bt-space-2: 16px;
+  --bt-space-3: 24px;
+  --bt-space-4: 32px;
+  --bt-gutter: 20px;          /* side padding on phone */
+
+  /* Motion */
+  --bt-ease: cubic-bezier(.2, .8, .2, 1);
+  --bt-fast: 150ms;
+  --bt-slow: 400ms;
+}
+
+/* ---------- Base ---------- */
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bt-black); color: var(--bt-white);
+  font: var(--bt-body); -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; }
+h1, h2, h3, p { margin: 0; }
+h1:focus { outline: none; }
+:focus-visible { outline: 3px solid var(--bt-yellow); outline-offset: 2px; border-radius: 8px; }
+.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+.page { max-width: 480px; margin: 0 auto; padding: var(--bt-space-2) var(--bt-gutter) var(--bt-space-4); }
+main { display: flex; flex-direction: column; gap: var(--bt-space-3); }
+.page.is-entering { animation: bt-fade var(--bt-fast) var(--bt-ease); }
+@keyframes bt-fade { from { opacity: 0; } }
+
+.text-link {
+  display: inline-flex; align-items: center; min-height: 44px;
+  color: var(--bt-white); font-weight: 700; text-underline-offset: 4px;
+}
+
+/* ---------- Top bar ---------- */
+.bt-topbar { position: sticky; top: 0; z-index: 1; background: var(--bt-black); }
+.bt-topbar-inner {
+  max-width: 480px; margin: 0 auto; padding: 12px var(--bt-gutter);
+  display: flex; justify-content: space-between; align-items: center;
+}
+.bt-wordmark { display: flex; align-items: center; gap: 10px; min-height: 44px; font: 800 1.25rem/1 var(--bt-font); text-decoration: none; }
+.bt-mark { width: 36px; height: 26px; }
+.bt-mark path { fill: none; stroke-width: 12; stroke-linecap: round; }
+.bt-menu-button {
+  width: 48px; height: 48px; border-radius: 50%;
+  display: grid; place-items: center; cursor: pointer;
+  background: transparent; color: var(--bt-white); border: 2px solid var(--bt-white);
+}
+
+/* ---------- Shared components ---------- */
+
+/* Line bullet: step numbers, pot icons, line letters */
+.bt-bullet {
+  flex: none; inline-size: 36px; block-size: 36px; border-radius: 50%;
+  display: grid; place-items: center;
+  font: 700 1rem/1 var(--bt-font); color: var(--bt-ink);
+  background: var(--line, var(--bt-white));
+}
+.bt-bullet[data-line="blue"] { --line: var(--bt-blue); color: var(--bt-white); }
+
+/* Station-sign card: white card, coloured top strip, black text. One card = one thing. */
+.bt-sign {
+  display: block; background: var(--bt-white); color: var(--bt-ink);
+  border-radius: var(--bt-radius-card); overflow: hidden;
+  border-top: var(--bt-strip) solid var(--line, var(--bt-yellow));
+  padding: var(--bt-space-2) var(--bt-space-3);
+  text-decoration: none;
+}
+
+/* Board number: big money amounts */
+.bt-board { font: var(--bt-display); letter-spacing: -0.03em; color: var(--bt-yellow); }
+
+/* Kicker: small uppercase label on black */
+.bt-kicker { font: var(--bt-kicker); text-transform: uppercase; letter-spacing: 0.18em; color: var(--bt-soft); }
+
+/* Status pill: always a word, plus a dot */
+.bt-pill {
+  flex: none; display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 12px; border-radius: var(--bt-radius-pill);
+  font: var(--bt-small); font-weight: 700; white-space: nowrap;
+}
+.bt-pill::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+.bt-pill[data-status="eligible"] { background: var(--bt-yellow); color: var(--bt-ink); }
+.bt-pill[data-status="claimed"]  { background: var(--bt-orange); color: var(--bt-ink); }
+.bt-pill[data-status="paid"]     { background: var(--bt-green); color: var(--bt-ink); }
+.bt-pill[data-status="none"]     { border: 1.5px solid var(--bt-dim); color: var(--bt-soft); }
+/* On a white sign card, the outline pill needs dark text to stay readable */
+.bt-sign .bt-pill[data-status="none"] { border-color: var(--bt-ink); color: var(--bt-ink); }
+
+/* Sign rule: separates sections */
+.bt-rule { height: 3px; margin: 0; border: 0; background: var(--bt-rule); }
+
+/* Buttons */
+.bt-btn {
+  min-block-size: 52px; padding: 0 var(--bt-space-3); border-radius: 14px; border: 0; cursor: pointer;
+  font: 700 1rem/1 var(--bt-font); background: var(--bt-yellow); color: var(--bt-ink);
+}
+.bt-btn--ghost { background: transparent; color: var(--bt-white); border: 2px solid var(--bt-white); }
+
+/* ---------- Loading screen ---------- */
+.splash {
+  min-height: calc(100vh - 48px); display: flex; flex-direction: column;
+  align-items: center; justify-content: center; text-align: center;
+}
+.splash-logo { width: 140px; height: 100px; }
+.splash-logo path {
+  fill: none; stroke-width: 7; stroke-linecap: round;
+  stroke-dasharray: 1; stroke-dashoffset: 1; animation: bt-draw var(--bt-slow) var(--bt-ease) forwards;
+}
+.splash-logo path:nth-child(2) { animation-delay: 0.1s; }
+.splash-logo path:nth-child(3) { animation-delay: 0.2s; }
+.splash-logo path:nth-child(4) { animation-delay: 0.3s; }
+.splash-logo path:nth-child(5) { animation-delay: 0.4s; }
+.splash-logo path:nth-child(6) { animation-delay: 0.6s; }
+@keyframes bt-draw { to { stroke-dashoffset: 0; } }
+.splash-title { margin-top: var(--bt-space-3); font: 800 2.75rem/1 var(--bt-font); letter-spacing: -0.03em; }
+.splash-tagline { margin-top: var(--bt-space-1); font: var(--bt-h2); color: var(--bt-yellow); }
+.splash-status { margin-top: var(--bt-space-4); color: var(--bt-soft); }
+.splash-skip { display: inline-flex; align-items: center; min-height: 44px; margin-top: var(--bt-space-1); font-weight: 700; text-underline-offset: 4px; }
+
+/* ---------- Home ---------- */
+.greeting { font: var(--bt-h1); }
+
+.reclaimed { display: flex; flex-direction: column; gap: var(--bt-space-1); }
+.reclaimed-sub { color: var(--bt-soft); }
+.reclaimed-coming { color: var(--bt-yellow); font-weight: 700; }
+
+.section-kicker { margin-bottom: 12px; }
+.line-status { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--bt-space-1); }
+.line-row {
+  display: flex; align-items: center; gap: 12px; min-height: 56px;
+  padding: 10px var(--bt-space-2); background: var(--bt-surface); border-radius: var(--bt-radius-card);
+}
+.line-name { flex: 1; font-weight: 700; }
+.line-state { font: var(--bt-small); font-weight: 700; }
+.line-state.is-ok { color: var(--bt-soft); }
+.line-state.is-bad { color: var(--bt-red); }
+
+.section-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.section-head h2 { font: var(--bt-h2); }
+.journey-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.journey { display: flex; align-items: center; gap: 12px; min-height: 72px; padding: 14px var(--bt-space-2); }
+.journey-main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+.journey-route { font-weight: 700; }
+.journey-meta { font: var(--bt-small); color: var(--bt-ink-soft); }
+
+.pot-card { display: flex; flex-direction: column; gap: 12px; }
+.pot-top { display: flex; align-items: center; gap: 12px; }
+.pot-names { display: flex; flex-direction: column; }
+.pot-name { font-weight: 700; }
+.pot-amount { font: 800 2rem/1 var(--bt-font); letter-spacing: -0.02em; }
+.pot-target { font: var(--bt-body); color: var(--bt-ink-soft); letter-spacing: 0; }
+.pot-bar { display: block; height: 14px; border-radius: var(--bt-radius-pill); border: 2px solid var(--bt-ink); overflow: hidden; }
+.pot-fill { display: block; height: 100%; background: var(--bt-pink); }
+
+/* ---------- Placeholder pages ---------- */
+.placeholder-title { font: var(--bt-h2); margin-bottom: 4px; }
+
+/* ---------- Respect "reduce motion": show end states instantly ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .page.is-entering { animation: none; }
+  .splash-logo path { animation: none; stroke-dashoffset: 0; }
+}

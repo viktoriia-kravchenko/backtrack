@@ -27,6 +27,16 @@ const CONSENT_STATEMENT = 'I agree to Kite Bank sending my name, email, card tok
 const PUBLIC_DIR = path.join(__dirname, '..', 'public');
 const STATIC_FILES = {
   '/': ['index.html', 'text/html; charset=utf-8'],
+  '/main.js': ['main.js', 'text/javascript; charset=utf-8'],
+  '/backtrack.css': ['backtrack.css', 'text/css; charset=utf-8'],
+  '/pages/loading.js': ['pages/loading.js', 'text/javascript; charset=utf-8'],
+  '/pages/home.js': ['pages/home.js', 'text/javascript; charset=utf-8'],
+  '/pages/placeholder.js': ['pages/placeholder.js', 'text/javascript; charset=utf-8'],
+  '/components/navbar.js': ['components/navbar.js', 'text/javascript; charset=utf-8'],
+  '/components/menu.js': ['components/menu.js', 'text/javascript; charset=utf-8'],
+  '/components/nav.css': ['components/nav.css', 'text/css; charset=utf-8'],
+  // Old Kite claim demo
+  '/kite.html': ['kite.html', 'text/html; charset=utf-8'],
   '/app.js': ['app.js', 'text/javascript; charset=utf-8'],
   '/styles.css': ['styles.css', 'text/css; charset=utf-8'],
 };

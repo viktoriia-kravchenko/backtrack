@@ -3,33 +3,35 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Kite Bank · TfL delay refunds</title>
-  <link rel="stylesheet" href="/styles.css">
+  <title>Backtrack</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@500;700;800&display=swap">
+  <link rel="stylesheet" href="/backtrack.css">
+  <link rel="stylesheet" href="/components/nav.css">
 </head>
 <body>
-  <div class="app">
-    <header class="top">
-      <div class="brand">Kite</div>
-      <p class="greeting" id="greeting">Hello</p>
-      <div class="balance-card">
-        <div class="label">Current account</div>
-        <div class="balance">£1,284.37</div>
-        <div class="sub" id="card-label">Visa Debit</div>
-      </div>
-    </header>
-    <main>
-      <h2 class="section-title">Transactions</h2>
-      <div id="txns" class="txns"><p class="muted pad">Loading…</p></div>
-      <p class="demo-note">Hackathon demo. Claims go to a mock TfL API, not to TfL.</p>
-    </main>
-  </div>
+  <!-- Top bar: logo on the left, menu button on the right. Stays on every page. -->
+  <header class="bt-topbar" id="topbar">
+    <div class="bt-topbar-inner">
+      <a class="bt-wordmark" href="#/home">
+        <svg class="bt-mark" viewBox="0 0 140 100" aria-hidden="true">
+          <path style="stroke: var(--bt-green)" d="M44 84 A20 20 0 0 1 84 84"/>
+          <path style="stroke: var(--bt-blue)" d="M24 84 A40 40 0 0 1 104 84"/>
+          <path style="stroke: var(--bt-yellow)" d="M4 84 A60 60 0 0 1 124 84"/>
+        </svg>
+        Backtrack
+      </a>
+      <button type="button" class="bt-menu-button" data-open-menu aria-label="Open menu" aria-haspopup="dialog" aria-controls="bt-menu" aria-expanded="false">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+    </div>
+  </header>
 
-  <div class="backdrop" id="backdrop" hidden></div>
-  <section class="sheet" id="sheet" role="dialog" aria-modal="true" aria-label="TfL delay refund" hidden>
-    <div class="sheet-bar"><span class="handle"></span><button class="close" id="close" aria-label="Close">✕</button></div>
-    <div id="sheet-body" class="sheet-body"></div>
-  </section>
+  <!-- main.js puts the current page in here -->
+  <div class="page" id="app"></div>
 
-  <script src="/app.js"></script>
+  <!-- Components first (they set up window.Backtrack), then the router -->
+  <script src="/components/navbar.js"></script>
+  <script src="/components/menu.js"></script>
+  <script type="module" src="/main.js"></script>
 </body>
 </html>
