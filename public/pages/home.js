@@ -1,6 +1,7 @@
 // Home page. Built from `homeData` plus the shared journeys and pots in data.js.
 // The data is hard-coded for now. Later it comes from GET /summary, /status and /journeys.
 import { journeys, pots, STATUS, money, esc } from '../data.js';
+import { potForJourney } from '../pots-store.js';
 
 const homeData = {
   firstName: 'Lena',
@@ -81,10 +82,11 @@ function pillHtml(journey) {
 }
 
 // One station-sign card per journey. The top strip colour matches its status.
-function journeysHtml() {
-  // The 4 most recent journeys that had a delay (on-time trips are on the Journeys page)
-  const recent = journeys.filter((j) => j.status !== 'ontime').slice(0, 4);
-  const cards = recent.map((j) => `<li>
+// A journey refunded into a pot takes the pot's look instead: its colour, name and description.
+function journeyCardHtml(j) {
+  const pot = potForJourney(j.id);
+  if (!pot) {
+    return `<li>
       <a class="bt-sign journey" href="#/journey/${esc(j.id)}" style="--line: var(${STATUS[j.status].line})">
         <span class="journey-main">
           <span class="journey-route">${esc(j.route)}</span>
@@ -92,7 +94,25 @@ function journeysHtml() {
         </span>
         ${pillHtml(j)}
       </a>
-    </li>`).join('');
+    </li>`;
+  }
+  return `<li>
+      <a class="bt-sign journey journey--pot" href="#/pots/${esc(pot.id)}" style="--line: var(${pot.line})">
+        <span class="bt-bullet" aria-hidden="true" style="--line: var(${pot.line})">${esc(pot.letter)}</span>
+        <span class="journey-main">
+          <span class="pot-name">${esc(pot.name)}</span>
+          ${pot.description ? `<span class="journey-meta">${esc(pot.description)}</span>` : ''}
+          <span class="journey-meta journey-via">${esc(j.route)}</span>
+        </span>
+        ${pillHtml(j)}
+      </a>
+    </li>`;
+}
+
+function journeysHtml() {
+  // The 4 most recent journeys that had a delay (on-time trips are on the Journeys page)
+  const recent = journeys.filter((j) => j.status !== 'ontime').slice(0, 4);
+  const cards = recent.map(journeyCardHtml).join('');
 
   return `<section aria-labelledby="journeys-heading">
     <div class="section-head">

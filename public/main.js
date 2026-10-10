@@ -3,6 +3,7 @@
 //   #/home       → Home
 //   #/journeys   → Journeys list
 //   #/journey/j1 → Refund page for journey j1
+//   #/pots       → Pots carousel (#/pots/<id> opens that pot). #/pot goes there too.
 //
 // To add a page: create pages/<name>.js, import it here, add it to `routes`,
 // and add its file to STATIC_FILES in bank/server.js.
@@ -10,6 +11,7 @@ import loadingPage from './pages/loading.js';
 import homePage from './pages/home.js';
 import journeysPage from './pages/journeys.js';
 import refundPage from './pages/refund.js';
+import potsPage from './pages/pots.js';
 import placeholderPage from './pages/placeholder.js';
 
 const routes = {
@@ -17,7 +19,8 @@ const routes = {
   home: homePage,
   journeys: journeysPage,
   journey: refundPage, // #/journey/j1 opens the refund page for journey j1
-  pot: placeholderPage('Pot', 'pot'),
+  pots: potsPage,      // #/pots/<id> opens that pot
+  pot: potsPage,       // the tab bar, Home's pot card and "Open pot" link to #/pot
   network: placeholderPage('Network', 'network'),
 };
 
