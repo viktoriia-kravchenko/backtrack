@@ -2,11 +2,13 @@
 //   /            → loading screen, then Home
 //   #/home       → Home
 //   #/journeys   → Journeys (placeholder for now)
+//   #/pots       → Pots carousel (#/pots/<id> opens that pot)
 //
 // To add a page: create pages/<name>.js, import it here, add it to `routes`,
 // and add its file to STATIC_FILES in bank/server.js.
 import loadingPage from './pages/loading.js';
 import homePage from './pages/home.js';
+import potsPage from './pages/pots.js';
 import placeholderPage from './pages/placeholder.js';
 
 const routes = {
@@ -14,7 +16,7 @@ const routes = {
   home: homePage,
   journeys: placeholderPage('Journeys', 'journeys'),
   journey: placeholderPage('Refund details', 'journeys'),
-  pot: placeholderPage('Pot', 'pot'),
+  pots: potsPage,
   network: placeholderPage('Network', 'network'),
 };
 
