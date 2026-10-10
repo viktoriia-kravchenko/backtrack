@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kite Bank · TfL delay refunds</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div class="app">
+    <header class="top">
+      <div class="brand">Kite</div>
+      <p class="greeting" id="greeting">Hello</p>
+      <div class="balance-card">
+        <div class="label">Current account</div>
+        <div class="balance">£1,284.37</div>
+        <div class="sub" id="card-label">Visa Debit</div>
+      </div>
+    </header>
+    <main>
+      <h2 class="section-title">Transactions</h2>
+      <div id="txns" class="txns"><p class="muted pad">Loading…</p></div>
+      <p class="demo-note">Hackathon demo. Claims go to a mock TfL API, not to TfL.</p>
+    </main>
+  </div>
+
+  <div class="backdrop" id="backdrop" hidden></div>
+  <section class="sheet" id="sheet" role="dialog" aria-modal="true" aria-label="TfL delay refund" hidden>
+    <div class="sheet-bar"><span class="handle"></span><button class="close" id="close" aria-label="Close">✕</button></div>
+    <div id="sheet-body" class="sheet-body"></div>
+  </section>
+
+  <script src="/app.js"></script>
+</body>
+</html>

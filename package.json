@@ -1,0 +1,13 @@
+{
+  "name": "tfl-refund-hackathon",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Hackathon prototype: claim a TfL delay refund from a banking app, against a mock TfL refund API",
+  "scripts": {
+    "start": "node start.js",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
