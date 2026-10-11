@@ -19,6 +19,7 @@ export default {
         </svg>
         <h1 class="splash-title">Backtrack</h1>
         <p class="splash-tagline">Refunds rerouted.</p>
+        <p class="splash-engine">Built on Engine by Starling</p>
       </div>
 
       <div class="splash-actions">

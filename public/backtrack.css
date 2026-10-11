@@ -423,6 +423,12 @@ a.bt-sign:active { transform: scale(0.98); }
 .splash-title, .splash-tagline { opacity: 0; animation: bt-rise 0.5s ease-out forwards; }
 .splash-title { animation-delay: 1.3s; }
 .splash-tagline { animation-delay: 1.45s; }
+/* "Built on Engine by Starling" under the tagline */
+.splash-engine {
+  margin-top: var(--bt-space-2); font: var(--bt-small); font-weight: 700;
+  letter-spacing: 0.04em; color: var(--bt-text-soft);
+  opacity: 0; animation: bt-rise 0.5s ease-out 1.6s forwards;
+}
 @keyframes bt-rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 
 /* Sign up and Log in: fade in last */
@@ -767,7 +773,7 @@ a.bt-sign:active { transform: scale(0.98); }
 @media (prefers-reduced-motion: reduce) {
   .page.is-entering, .bt-menu[open] { animation: none; }
   .splash-logo .logo-line, .splash-logo .logo-stop, .splash-logo .logo-arrow,
-  .splash-title, .splash-tagline { animation: none; stroke-dashoffset: 0; opacity: 1; transform: none; }
+  .splash-title, .splash-tagline, .splash-engine { animation: none; stroke-dashoffset: 0; opacity: 1; transform: none; }
   .splash-actions { animation: none; opacity: 1; }
   .bt-btn:active { transform: none; }
   a.bt-sign, .bt-switch-knob, .bt-toast { transition: none; }
