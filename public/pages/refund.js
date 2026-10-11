@@ -1,7 +1,8 @@
 // Refund page: one journey and where its refund has got to.  Opened with #/journey/<id>
 //
 // For an eligible journey you haven't claimed yet, this is the claim screen:
-//   everything is filled in and checked for you; you just pick a pot, agree, and send.
+//   journey details are filled in from your taps; only the lines and minutes late can change,
+//   and "Checked for you" re-checks them as you type. Then pick a pot, agree, and send.
 // After sending, the route line updates live as TfL reviews it:
 //   Delayed → Checked → Claimed → Paid → Saved
 //
@@ -11,9 +12,18 @@
 import { findJourney, journeys, pots, findPot, money, esc } from '../data.js';
 import { api } from '../api.js';
 
-// Claims started in this session, by journey id: { status, potId, claimId, receivedAt, last4, message }
+// Claims started in this session, by journey id: { status, potId, late, lines, claimId, receivedAt, last4, message }
 // status: sending → received → under_review → approved | rejected
 const claims = {};
+
+// What you've typed on the claim screen before sending, by journey id: { late, lines, potId }
+const drafts = {};
+
+// Lines you can pick for the live journey. `reported` = what TfL's status feed said at that time.
+const LINE_CHOICES = [
+  { id: 'victoria', name: 'Victoria', reported: 'a signal failure at Oxford Circus' },
+  { id: 'northern', name: 'Northern', reported: null },
+];
 
 let currentId = null; // the journey on screen
 let root = null;      // where the page is drawn
@@ -75,7 +85,7 @@ function headline(j, c) {
 // Each stop has a title, a detail line and a state:
 // done, current (happening now), todo (still to come) or stopped (ends here).
 function stops(j, c) {
-  const late = j.mins != null ? j.mins - j.usual : null;
+  const late = c?.late != null ? Number(c.late) : j.mins != null ? j.mins - j.usual : null;
   const tapped = j.tapOut ? `Tap in ${j.tapIn}, tap out ${j.tapOut}` : `Tap in ${j.tapIn}, no tap out recorded`;
   const checked = late != null
     ? `${late} min late, over the ${j.threshold} min ${j.line === 'Elizabeth' ? 'Elizabeth line' : 'Tube'} limit`
@@ -158,41 +168,128 @@ function routeHtml(j, c) {
   </section>`;
 }
 
-// ---------- how late were you? ----------
+// ---------- journey details ----------
 
-function delayHtml(j) {
-  if (j.mins == null) {
-    return `<section class="refund-card" aria-labelledby="delay-heading">
-      <h2 id="delay-heading" class="refund-card-title">What happened</h2>
-      <p>${esc(j.cause)}.</p>
-    </section>`;
-  }
-  const max = Math.max(j.mins, j.usual);
-  const late = j.mins - j.usual;
-  return `<section class="refund-card" aria-labelledby="delay-heading">
-    <h2 id="delay-heading" class="refund-card-title">How late were you?</h2>
-    <div class="delay-row">
-      <span class="delay-label">Usually</span>
-      <span class="delay-track"><span class="delay-bar is-usual" style="width:${(j.usual / max) * 100}%"></span></span>
-      <span class="delay-value">${j.usual} min</span>
+const lineLabel = (name) => (name === 'DLR' ? 'DLR' : `${name} line`);
+
+// "Highbury & Islington → Oxford Circus" → ["Highbury & Islington", "Oxford Circus"]
+function fromTo(j) {
+  if (j.from) return [j.from, j.to];
+  const [from, to] = j.route.split(' → ');
+  return [from.replace(', no tap out', ''), to || 'No tap out'];
+}
+
+const staticField = (label, value) => `<div class="jd-field">
+    <span class="jd-label">${label}</span>
+    <span class="jd-value">${esc(value)}</span>
+  </div>`;
+
+// Read-only version: every journey, and the live one after it's sent.
+function detailsHtml(j, c) {
+  const [from, to] = fromTo(j);
+  const late = c?.late != null ? Number(c.late) : j.mins != null ? j.mins - j.usual : null;
+  const lines = c?.lines
+    ? c.lines.map((id) => LINE_CHOICES.find((l) => l.id === id).name).join(' and ') + (c.lines.length > 1 ? ' lines' : ' line')
+    : lineLabel(j.line);
+
+  return `<section class="refund-card" aria-labelledby="details-heading">
+    <h2 id="details-heading" class="bt-kicker jd-heading">Journey details</h2>
+    <div class="jd-grid">
+      ${staticField('Date', j.date)}
+      ${staticField('Line', lines)}
+      ${staticField('From', from)}
+      ${staticField('To', to)}
+      ${staticField('Started at', j.tapIn)}
+      ${staticField('Minutes late', late == null ? 'No tap out' : late > 0 ? `${late} min` : 'On time')}
     </div>
-    <div class="delay-row">
-      <span class="delay-label">This time</span>
-      <span class="delay-track"><span class="delay-bar is-yours" style="width:${(j.mins / max) * 100}%"></span></span>
-      <span class="delay-value">${j.mins} min</span>
-    </div>
-    <p class="delay-summary"><strong>${late > 0 ? `${late} min late` : 'On time'}</strong>${j.cause ? ` · ${esc(j.cause)}` : ''}</p>
+    ${j.cause ? `<p class="jd-cause"><strong>Cause:</strong> ${esc(j.cause)}</p>` : ''}
   </section>`;
+}
+
+// Editable version, on the claim screen: only the lines and minutes late can change.
+function detailsFormHtml(j, d) {
+  const [from, to] = fromTo(j);
+  const measured = j.mins - j.usual;
+  const chips = LINE_CHOICES.map((l) => `<label class="jd-chip">
+      <input type="checkbox" name="lines" value="${l.id}" ${d.lines.includes(l.id) ? 'checked' : ''}>
+      ${l.name}
+    </label>`).join('');
+
+  return `<section class="refund-card" aria-labelledby="details-heading">
+    <h2 id="details-heading" class="bt-kicker jd-heading">Journey details</h2>
+    <p class="jd-intro">Filled in from your taps. Change the line or minutes late if they're wrong.</p>
+    <div class="jd-grid">
+      ${staticField('Date', j.date)}
+      <fieldset class="jd-field">
+        <legend class="jd-label">Lines</legend>
+        <div class="jd-chips">${chips}</div>
+      </fieldset>
+      ${staticField('From', from)}
+      ${staticField('To', to)}
+      ${staticField('Started at', j.tapIn)}
+      <div class="jd-field">
+        <label class="jd-label" for="jd-late">Minutes late</label>
+        <input class="jd-input" id="jd-late" name="late" type="text" inputmode="numeric" autocomplete="off"
+          placeholder="e.g. 25" value="${esc(d.late)}" aria-describedby="jd-late-hint">
+        <span class="jd-hint" id="jd-late-hint">Your taps say ${measured} min</span>
+      </div>
+    </div>
+  </section>`;
+}
+
+// ---------- "Checked for you": re-checked every time you change the details ----------
+
+function checkClaim(j, d) {
+  const items = [{ ok: true, text: "Within TfL's 28-day claim window" }];
+
+  // Minutes late
+  const raw = d.late.trim();
+  const late = Number(raw);
+  if (raw === '') {
+    items.push({ ok: false, field: 'late', text: 'Enter how many minutes late you were' });
+  } else if (!/^\d+$/.test(raw)) {
+    items.push({ ok: false, field: 'late', text: 'Minutes late should be a whole number, like 25' });
+  } else if (late > j.mins) {
+    items.push({ ok: false, field: 'late', text: `${late} min is longer than your whole journey (${j.mins} min from your taps)` });
+  } else if (late < j.threshold) {
+    items.push({ ok: false, field: 'late', text: `${late} min late. Tube refunds start at ${j.threshold} min` });
+  } else {
+    items.push({ ok: true, text: `${late} min late, over the ${j.threshold} min Tube limit` });
+  }
+
+  // Lines: at least one, and TfL must have reported a delay on one of them
+  const chosen = LINE_CHOICES.filter((l) => d.lines.includes(l.id));
+  const cause = chosen.find((l) => l.reported);
+  if (!chosen.length) {
+    items.push({ ok: false, field: 'lines', text: 'Choose the line you were on' });
+  } else if (cause) {
+    items.push({ ok: true, text: `TfL reported ${cause.reported} on the ${cause.name} line, which is within their control` });
+  } else {
+    items.push({ ok: false, field: 'lines', text: `TfL reported no delays on the ${chosen.map((l) => l.name).join(' or ')} line at ${j.tapIn}` });
+  }
+
+  return { items, ok: items.every((i) => i.ok), problem: items.find((i) => !i.ok) };
+}
+
+function checksListHtml(result) {
+  return result.items.map((i) => `<li class="${i.ok ? '' : 'is-problem'}">
+      <span class="claim-tick ${i.ok ? '' : 'is-bad'}" aria-hidden="true">${i.ok ? '✓' : '!'}</span>
+      <span><span class="visually-hidden">${i.ok ? 'Passed: ' : 'Problem: '}</span>${esc(i.text)}</span>
+    </li>`).join('');
 }
 
 // ---------- the claim screen (live journey, not sent yet) ----------
 
+function getDraft(j) {
+  if (!drafts[j.id]) drafts[j.id] = { late: String(j.mins - j.usual), lines: [j.apiLine], potId: pots[0].id };
+  return drafts[j.id];
+}
+
 function claimFormHtml(j) {
-  const late = j.mins - j.usual;
-  const chosen = claims[`draft-${j.id}`] || pots[0].id; // pot picked before, or the first pot
+  const d = getDraft(j);
 
   const potOptions = pots.map((p) => `<label class="pot-option">
-      <input type="radio" name="pot" value="${p.id}" ${p.id === chosen ? 'checked' : ''}>
+      <input type="radio" name="pot" value="${p.id}" ${p.id === d.potId ? 'checked' : ''}>
       <span class="bt-bullet" aria-hidden="true" style="--line: var(${p.colour})">${p.letter}</span>
       <span class="pot-option-text">
         <span class="pot-option-name">${esc(p.name)}</span>
@@ -200,16 +297,14 @@ function claimFormHtml(j) {
       </span>
     </label>`).join('');
 
-  return `<section class="refund-card" aria-labelledby="checks-heading">
-      <h2 id="checks-heading" class="refund-card-title">Checked for you</h2>
-      <ul class="claim-checks">
-        <li><span class="claim-tick" aria-hidden="true">✓</span>Within TfL's 28-day claim window</li>
-        <li><span class="claim-tick" aria-hidden="true">✓</span>${late} min late, over the ${j.threshold} min Tube limit</li>
-        <li><span class="claim-tick" aria-hidden="true">✓</span>TfL reported a signal failure, which is within their control</li>
-      </ul>
-    </section>
+  return `<form class="claim-form" id="claim-form" novalidate>
+      ${detailsFormHtml(j, d)}
 
-    <form class="claim-form" id="claim-form" novalidate>
+      <section class="refund-card" aria-labelledby="checks-heading">
+        <h2 id="checks-heading" class="refund-card-title">Checked for you</h2>
+        <ul class="claim-checks" id="claim-checks" aria-live="polite">${checksListHtml(checkClaim(j, d))}</ul>
+      </section>
+
       <div class="refund-card">
         <fieldset class="pot-picker">
           <legend class="refund-card-title">Where should the ${money(j.amount)} go?</legend>
@@ -308,14 +403,14 @@ function applyClaim(j, claim) {
   rerender();
 }
 
-// Real claim through the bank server.
+// Real claim through the bank server. Sends the minutes late you entered.
 async function sendClaim(j) {
   try {
     const draft = await api('/api/tfl-claims/draft', { method: 'POST', body: { transactionId: j.txnId } });
     const journey = {
       ...draft.prefill.journey,
       line: j.apiLine, from: j.from, to: j.to, plannedStart: j.tapIn,
-      delayMinutes: j.mins - j.usual,
+      delayMinutes: Number(claims[j.id].late),
     };
     const claim = await api('/api/tfl-claims', {
       method: 'POST',
@@ -375,8 +470,7 @@ const page = {
           <span><strong>${h.title}</strong><span class="refund-headline-body">${h.body}</span></span>
         </section>
 
-        ${delayHtml(j)}
-        ${showForm ? claimFormHtml(j) : ''}
+        ${showForm ? claimFormHtml(j) : detailsHtml(j, c)}
         ${j.status !== 'ontime' ? routeHtml(j, c) : ''}
         ${!j.live && j.status === 'none' ? rulesHtml() : ''}
         ${moneyBarHtml(j, c)}
@@ -398,17 +492,41 @@ const page = {
     if (!form) return;
 
     const j = findJourney(currentId);
+    const d = getDraft(j);
+    const lateInput = form.elements.late;
+    const error = el.querySelector('#claim-error');
+    const checksList = el.querySelector('#claim-checks');
+    let lastChecks = checksList.innerHTML;
 
-    // Remember the pot choice if you leave and come back before sending.
-    form.addEventListener('change', (e) => {
-      if (e.target.name === 'pot') claims[`draft-${j.id}`] = e.target.value;
-    });
+    // Re-check after every change, so "Checked for you" always matches what's typed.
+    function recheck() {
+      d.late = lateInput.value;
+      d.lines = [...form.querySelectorAll('input[name="lines"]:checked')].map((box) => box.value);
+      d.potId = form.elements.pot.value;
+      const result = checkClaim(j, d);
+      const html = checksListHtml(result);
+      if (html !== lastChecks) { // only update when something changed, so screen readers aren't flooded
+        checksList.innerHTML = html;
+        lastChecks = html;
+      }
+      lateInput.setAttribute('aria-invalid', result.items.some((i) => i.field === 'late') ? 'true' : 'false');
+      if (result.ok) error.hidden = true;
+      return result;
+    }
+    form.addEventListener('input', recheck);
+    form.addEventListener('change', recheck);
 
     form.addEventListener('submit', (e) => {
       e.preventDefault();
-      const error = el.querySelector('#claim-error');
+      const result = recheck();
       const consent = el.querySelector('#claim-consent');
 
+      if (!result.ok) {
+        error.textContent = `${result.problem.text}.`;
+        error.hidden = false;
+        (result.problem.field === 'late' ? lateInput : form.querySelector('input[name="lines"]')).focus();
+        return;
+      }
       if (!consent.checked) {
         error.textContent = 'Tick the box so we can send the claim for you.';
         error.hidden = false;
@@ -416,7 +534,7 @@ const page = {
         return;
       }
 
-      claims[j.id] = { status: 'sending', potId: form.elements.pot.value };
+      claims[j.id] = { status: 'sending', potId: d.potId, late: d.late.trim(), lines: [...d.lines] };
       document.getElementById('screen')?.scrollTo(0, 0);
       rerender();
       sendClaim(j);

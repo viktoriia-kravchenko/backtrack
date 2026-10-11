@@ -122,7 +122,10 @@ function journeyCardHtml(j) {
 
 function journeysHtml() {
   // The 4 most recent journeys that had a delay (on-time trips are on the Journeys page)
-  const recent = journeys.filter((j) => j.status !== 'ontime').slice(0, 4);
+    // The 4 journeys shown on Home: one of each kind (eligible, claimed, paid, not eligible).
+  // Everything else is on the Journeys page.
+  const HOME_JOURNEYS = ['j1', 'j6', 'j2', 'j4'];
+  const recent = journeys.filter((j) => HOME_JOURNEYS.includes(j.id));
   const cards = recent.map(journeyCardHtml).join('');
 
   return `<section aria-labelledby="journeys-heading">

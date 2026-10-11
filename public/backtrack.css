@@ -1243,3 +1243,40 @@ a.line-row:focus-visible { outline: 3px solid var(--bt-focus); outline-offset: 2
 @media (prefers-reduced-motion: reduce) {
   .line-summary::after { transition: none; }
 }
+
+/* ========== 19. Journey details + live checks (refund page) ========== */
+.jd-heading { margin-bottom: 12px; }
+.jd-intro { margin: -4px 0 14px; font: var(--bt-small); color: var(--bt-text-soft); }
+.jd-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 12px; align-items: start; }
+.jd-field { display: flex; flex-direction: column; gap: 6px; min-width: 0; margin: 0; padding: 0; border: 0; }
+.jd-label { padding: 0; font-weight: 600; color: var(--bt-text); }
+
+/* Fixed values: soft grey boxes. The things you can change: white with a dark border. */
+.jd-value, .jd-input {
+  min-height: 52px; padding: 12px 14px; border-radius: 14px;
+  font: inherit; color: var(--bt-text);
+}
+.jd-value {
+  display: flex; align-items: center; overflow-wrap: anywhere;
+  background: var(--bt-bg); border: 1.5px solid var(--bt-edge);
+}
+.jd-input { width: 100%; background: var(--bt-card); border: 2px solid var(--bt-ink); }
+.jd-input::placeholder { color: var(--bt-text-soft); }
+.jd-input:focus-visible { outline: 3px solid var(--bt-focus); outline-offset: 2px; }
+.jd-input[aria-invalid="true"] { border-color: var(--bt-bad-text); background: #FFF5F4; }
+.jd-hint { font: var(--bt-small); color: var(--bt-text-soft); }
+
+.jd-chips { display: flex; flex-direction: column; gap: 6px; }
+.jd-chip {
+  display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 8px 12px;
+  border-radius: 14px; border: 2px solid var(--bt-ink); background: var(--bt-card);
+  font-weight: 600; cursor: pointer;
+}
+.jd-chip input { flex: none; width: 20px; height: 20px; margin: 0; accent-color: var(--bt-ink); }
+.jd-chip:has(input:checked) { background: var(--bt-overview-bg); }
+.jd-chip:has(input:focus-visible) { outline: 3px solid var(--bt-focus); outline-offset: 2px; }
+.jd-cause { margin-top: 14px; color: var(--bt-text-soft); }
+
+/* A check that fails: red "!" plus words, never colour alone */
+.claim-checks li.is-problem { color: var(--bt-bad-text); font-weight: 600; }
+.claim-tick.is-bad { background: var(--bt-bad-text); color: var(--bt-white); }
