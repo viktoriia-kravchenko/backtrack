@@ -1,5 +1,5 @@
 // Welcome screen: the first thing you see when the app starts.
-// The logo draws in, then the Sign up and Log in buttons fade in.
+// The logo draws in, then the title and the Sign up / Log in buttons fade in.
 // For now both buttons go straight to Home.
 
 export default {
@@ -9,13 +9,13 @@ export default {
   render() {
     return `<div class="splash">
       <div class="splash-brand">
-        <svg class="splash-logo" viewBox="0 0 140 100" role="img" aria-label="Backtrack logo">
-          <path pathLength="1" style="stroke: var(--bt-green)" d="M44 84 A20 20 0 0 1 84 84"/>
-          <path pathLength="1" style="stroke: var(--bt-blue)" d="M34 84 A30 30 0 0 1 94 84"/>
-          <path pathLength="1" style="stroke: var(--bt-pink)" d="M24 84 A40 40 0 0 1 104 84"/>
-          <path pathLength="1" style="stroke: var(--bt-orange)" d="M14 84 A50 50 0 0 1 114 84"/>
-          <path pathLength="1" style="stroke: var(--bt-yellow)" d="M4 84 A60 60 0 0 1 124 84"/>
-          <path pathLength="1" style="stroke: var(--bt-text)" d="M100 40 L130 10 M114 10 H130 V26"/>
+        <svg class="bt-logo splash-logo" viewBox="96 30 312 440" role="img" aria-label="Backtrack logo">
+          <g transform="translate(-14,6)">
+            <path class="logo-line logo-orange" pathLength="1" d="M161.3,310 A84,84 0 0 1 273.4,277.8"/>
+            <path class="logo-line logo-main" pathLength="1" d="M150,64 V352 A84,84 0 0 0 318,352 C318,306 324,274 381.5,225.9"/>
+            <polygon class="logo-arrow" points="412.0,200.0 327.1,214.3 384.0,281.4"/>
+            <circle class="logo-stop" cx="150" cy="64" r="30"/>
+          </g>
         </svg>
         <h1 class="splash-title">Backtrack</h1>
         <p class="splash-tagline">Refunds rerouted.</p>

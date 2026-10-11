@@ -148,8 +148,12 @@ main { display: flex; flex-direction: column; gap: var(--bt-space-3); }
   display: flex; align-items: center; gap: 10px; min-height: 44px;
   font: 800 1.25rem/1 var(--bt-font); text-decoration: none;
 }
-.bt-mark { width: 36px; height: 26px; }
-.bt-mark path { fill: none; stroke-width: 12; stroke-linecap: round; }
+.bt-mark {
+  flex: none; width: 40px; height: 40px; border-radius: 11px;
+  display: grid; place-items: center;
+  background: #111111; /* dark tile so the yellow logo stands out on the light theme */
+}
+.bt-mark svg { width: 20px; height: 28px; }
 .bt-menu-button {
   width: 48px; height: 48px; border-radius: 50%;
   display: grid; place-items: center; cursor: pointer;
@@ -522,6 +526,7 @@ a.bt-sign:active { transform: scale(0.98); }
   --bt-bezel: 12px;           /* thickness of the phone's black edge */
   --bt-bezel-colour: #111111;
   --bt-phone-radius: 48px;    /* roundness of the phone's corners */
+  --bt-phone-max-zoom: 1;     /* phone size on a laptop: 1 = real size (shrinks to fit), 0.85 = smaller */
   --bt-tabbar-height: 72px;
 }
 
@@ -546,7 +551,8 @@ body {
 
 /* The phone. Its height shrinks to fit if the laptop screen is short. */
 .phone {
-  --phone-height: min(calc(var(--bt-app-height) + var(--bt-bezel) * 2), calc(100dvh - 32px));
+    --phone-height: calc(var(--bt-app-height) + var(--bt-bezel) * 2);
+  zoom: var(--phone-zoom, 1);
   position: relative;
   width: calc(var(--bt-app-width) + var(--bt-bezel) * 2);
   height: var(--phone-height);
@@ -604,8 +610,14 @@ main { display: flex; flex-direction: column; gap: var(--bt-space-3); }
   display: flex; align-items: center; gap: 10px; min-height: 44px;
   font: 800 1.25rem/1 var(--bt-font); text-decoration: none;
 }
-.bt-mark { width: 36px; height: 26px; }
-.bt-mark path { fill: none; stroke-width: 12; stroke-linecap: round; }
+/* Logo (used in the top bar and on the welcome screen) */
+.bt-logo { display: block; overflow: visible; }
+.bt-logo .logo-line { fill: none; stroke-width: 48; stroke-linecap: round; stroke-linejoin: round; }
+.bt-logo .logo-main { stroke: #FFD02F; }
+.bt-logo .logo-orange { stroke: #FF6A1A; }
+.bt-logo .logo-arrow { fill: #FFD02F; stroke: #FFD02F; stroke-width: 12; stroke-linejoin: round; }
+.bt-logo .logo-stop { fill: #FFFFFF; stroke: #000000; stroke-width: 12; }
+.bt-logo-mark { width: 26px; height: 37px; flex: none; }
 .bt-menu-button {
   width: 48px; height: 48px; border-radius: 50%;
   display: grid; place-items: center; cursor: pointer;
@@ -702,7 +714,8 @@ a.bt-sign:active { transform: scale(0.98); }
 .bt-menu {
   margin: auto; padding: 0; border: 0;
   width: var(--bt-app-width); max-width: 100%;
-  height: min(var(--bt-app-height), calc(100dvh - 32px - var(--bt-bezel) * 2)); max-height: 100%;
+  height: var(--bt-app-height); max-height: 100%;
+  zoom: var(--phone-zoom, 1);
   border-radius: calc(var(--bt-phone-radius) - var(--bt-bezel));
   background: var(--bt-bg); color: var(--bt-text);
 }
@@ -776,28 +789,34 @@ a.bt-sign:active { transform: scale(0.98); }
   display: flex; flex-direction: column; text-align: center;
 }
 .splash-brand { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-.splash-logo { width: 140px; height: 100px; }
-.splash-logo path {
-  fill: none; stroke-width: 7; stroke-linecap: round;
-  stroke-dasharray: 1; stroke-dashoffset: 1; animation: bt-draw var(--bt-slow) var(--bt-ease) forwards;
-}
-.splash-logo path:nth-child(2) { animation-delay: 0.1s; }
-.splash-logo path:nth-child(3) { animation-delay: 0.2s; }
-.splash-logo path:nth-child(4) { animation-delay: 0.3s; }
-.splash-logo path:nth-child(5) { animation-delay: 0.4s; }
-.splash-logo path:nth-child(6) { animation-delay: 0.6s; }
+
+/* Logo animation: station dot pops, yellow line draws, orange arc joins, arrow pops */
+.splash-logo { width: 150px; height: 212px; }
+.splash-logo .logo-line { stroke-dasharray: 1; stroke-dashoffset: 1; }
+.splash-logo .logo-main { animation: bt-draw 1s cubic-bezier(0.65, 0, 0.35, 1) 0.3s forwards; }
+.splash-logo .logo-orange { animation: bt-draw 0.45s ease-out 1.05s forwards; }
+.splash-logo .logo-stop,
+.splash-logo .logo-arrow { opacity: 0; transform-box: fill-box; transform-origin: center; }
+.splash-logo .logo-stop { animation: bt-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+.splash-logo .logo-arrow { animation: bt-pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) 1.2s forwards; }
 @keyframes bt-draw { to { stroke-dashoffset: 0; } }
+@keyframes bt-pop { from { opacity: 0; transform: scale(0.3); } to { opacity: 1; transform: scale(1); } }
+
 .splash-title { margin-top: var(--bt-space-3); font: 800 2.75rem/1 var(--bt-font); letter-spacing: -0.03em; }
 .splash-tagline {
   margin-top: var(--bt-space-2); padding: 4px 12px; border-radius: 8px;
   font: var(--bt-h2); background: var(--bt-yellow); color: var(--bt-ink);
 }
+.splash-title, .splash-tagline { opacity: 0; animation: bt-rise 0.5s ease-out forwards; }
+.splash-title { animation-delay: 1.3s; }
+.splash-tagline { animation-delay: 1.45s; }
+@keyframes bt-rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 
-/* Sign up and Log in: fade in once the logo has drawn */
+/* Sign up and Log in: fade in last */
 .splash-actions {
   display: flex; flex-direction: column; gap: 12px;
   padding-top: var(--bt-space-3);
-  opacity: 0; animation: bt-appear var(--bt-slow) var(--bt-ease) 1.1s forwards;
+  opacity: 0; animation: bt-appear var(--bt-slow) var(--bt-ease) 1.7s forwards;
 }
 @keyframes bt-appear { to { opacity: 1; } }
 
@@ -1134,7 +1153,8 @@ a.bt-sign:active { transform: scale(0.98); }
 /* ---------- 16. Reduced motion: show end states instantly ---------- */
 @media (prefers-reduced-motion: reduce) {
   .page.is-entering, .bt-menu[open] { animation: none; }
-  .splash-logo path { animation: none; stroke-dashoffset: 0; }
+  .splash-logo .logo-line, .splash-logo .logo-stop, .splash-logo .logo-arrow,
+  .splash-title, .splash-tagline { animation: none; stroke-dashoffset: 0; opacity: 1; transform: none; }
   .splash-actions { animation: none; opacity: 1; }
   .bt-btn:active { transform: none; }
   a.bt-sign, .bt-switch-knob, .bt-toast { transition: none; }

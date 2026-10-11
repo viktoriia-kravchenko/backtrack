@@ -42,6 +42,7 @@ const STATIC_FILES = {
     '/pages/lines.js': ['pages/lines.js', 'text/javascript; charset=utf-8'],
   '/components/navbar.js': ['components/navbar.js', 'text/javascript; charset=utf-8'],
   '/components/menu.js': ['components/menu.js', 'text/javascript; charset=utf-8'],
+    '/logo.svg': ['logo.svg', 'image/svg+xml'],
   // Old Kite claim demo
   '/kite.html': ['kite.html', 'text/html; charset=utf-8'],
   '/app.js': ['app.js', 'text/javascript; charset=utf-8'],

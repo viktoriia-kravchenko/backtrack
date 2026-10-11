@@ -65,7 +65,10 @@ function overviewHtml({ firstName, reclaimed }) {
 // Line bullet + name + status word. Status uses an icon AND words, not colour alone.
 // Your lines, each linking to that line on the Lines page. Icon AND words, not colour alone.
 function linesHtml() {
-  const rows = lines.filter((l) => l.yours).map((line) => `<li>
+    // Just two on Home: your first delayed line and your first planned closure (All lines shows the rest)
+  const yours = lines.filter((l) => l.yours);
+  const two = ['delay', 'closure', 'good'].map((kind) => yours.find((l) => l.kind === kind)).filter(Boolean).slice(0, 2);
+  const rows = two.map((line) => `<li>
       <a class="line-row" href="#/lines/${esc(line.id)}">
         ${lineBadge(line)}
         <span class="line-name">${esc(line.name)}</span>

@@ -26,6 +26,18 @@ const routes = {
   network: linesPage,
 };
 
+
+// Fit the whole phone on a laptop screen: shrink it rather than cutting off the bottom.
+function fitPhone() {
+  const css = getComputedStyle(document.documentElement);
+  const fullHeight = parseFloat(css.getPropertyValue('--bt-app-height')) + parseFloat(css.getPropertyValue('--bt-bezel')) * 2;
+  const maxZoom = parseFloat(css.getPropertyValue('--bt-phone-max-zoom')) || 1;
+  const zoom = window.innerWidth <= 500 ? 1 : Math.min(maxZoom, (window.innerHeight - 32) / fullHeight);
+  document.documentElement.style.setProperty('--phone-zoom', zoom.toFixed(3));
+}
+fitPhone();
+window.addEventListener('resize', fitPhone);
+
 // The top bar is in index.html. The navbar and menu are created once and stay between pages.
 // The navbar goes inside the phone, after the scrolling screen, so it sits at the bottom.
 const phone = document.getElementById('phone');
