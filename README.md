@@ -1,8 +1,12 @@
-# TfL delay refunds from a banking app (hackathon prototype)
+# Backtrack: TfL delay refunds, rerouted (hackathon prototype)
+
+*Refunds rerouted.* Backtrack spots TfL journeys that qualify for a delay refund, helps the customer
+claim, and saves the money into a pot (an Engine Space) when it lands.
 
 A customer taps **"Delayed? Claim a refund"** on a TfL contactless charge in their banking app.
 The bank prefills the claim from what it already knows, checks it against TfL's rules and line
-status, and sends it to TfL with the customer's consent. The app then tracks the claim to a decision.
+status, and sends it to TfL with the customer's consent. Nothing is sent without the customer
+confirming the journey details first. The app then tracks the claim to a decision.
 
 > **TfL has no public API for refund claims.** The refund API here is a mock of what a
 > bank-TfL partnership could look like. Nothing is sent to the real TfL.
@@ -113,6 +117,17 @@ with keyword matching. TfL's own records always decide.
   explicit, recorded consent and a lawful basis. The prototype records a consent statement and timestamp.
 - Mainline trains run by other operators use their own Delay Repay schemes, not TfL's.
 
+## Look and feel
+
+The app is styled like a transit sign board: a pale stone background with three kinds of tile.
+White sign cards with a coloured strip hold journeys, pots and menu groups. Black panels hold
+line status, totals and refund details. The yellow card on Home is the money overview. The
+welcome screen is a full black sign with the logo drawing in.
+
+All colours, type and spacing are variables at the top of `public/backtrack.css` (sections 1 to 3).
+Change those, not the components. The logo is `public/logo.svg`; the same shape is inline in
+`index.html` (top bar) and `pages/loading.js` (welcome screen).
+
 ## Files
 
 ```
@@ -121,5 +136,9 @@ lib/                  shared rules (28 days, thresholds, causes), validation, da
 mock-tfl/             mock TfL refund API + fake service records
 bank/                 bank backend, fake customer data, TfL clients
 public/               banking app UI (plain HTML/CSS/JS)
+  backtrack.css       all styles (the only stylesheet index.html loads)
+  logo.svg            app icon / favicon
+  main.js             router: #/home, #/journeys, #/journey/<id>, #/pots, #/lines
+  pages/              one file per screen: loading (welcome), home, journeys, refund, pots, lines
 test/flow.test.js     end-to-end tests
 ```
