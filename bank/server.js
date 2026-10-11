@@ -39,12 +39,14 @@ const STATIC_FILES = {
    '/pages/journeys.js': ['pages/journeys.js', 'text/javascript; charset=utf-8'],
   '/pages/refund.js': ['pages/refund.js', 'text/javascript; charset=utf-8'],
   '/pages/placeholder.js': ['pages/placeholder.js', 'text/javascript; charset=utf-8'],
+    '/pages/lines.js': ['pages/lines.js', 'text/javascript; charset=utf-8'],
   '/components/navbar.js': ['components/navbar.js', 'text/javascript; charset=utf-8'],
   '/components/menu.js': ['components/menu.js', 'text/javascript; charset=utf-8'],
   // Old Kite claim demo
   '/kite.html': ['kite.html', 'text/html; charset=utf-8'],
   '/app.js': ['app.js', 'text/javascript; charset=utf-8'],
   '/styles.css': ['styles.css', 'text/css; charset=utf-8'],
+  
 };
 
 function createBankServer({

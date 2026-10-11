@@ -15,7 +15,7 @@
     { id: 'home', label: 'Home', href: '#/home', icon: icon('<path d="M4 18c4 0 4-12 8-12s4 12 8 12"/><circle cx="12" cy="6" r="2"/>') },
     { id: 'journeys', label: 'Journeys', href: '#/journeys', icon: icon('<path d="M5 6h14M5 12h14M5 18h9"/>') },
     { id: 'pots', label: 'Pots', href: '#/pots', icon: icon('<circle cx="12" cy="12" r="9"/><path d="M14.5 9a2.5 2.5 0 0 0-4.5 1.5V16M8.5 16h7M8.5 12.5h4.5"/>') },
-    { id: 'network', label: 'Network', href: '#/network', icon: icon('<path d="M6 19v-4M11 19v-8M16 19V9M21 19V5"/>') },
+    { id: 'lines', label: 'Lines', href: '#/lines', icon: icon('<path d="M6 19v-4M11 19v-8M16 19V9M21 19V5"/>') },
   ];
 
   // Short message at the bottom of the screen, e.g. "Pot is coming soon".

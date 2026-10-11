@@ -90,3 +90,37 @@ export const findJourney = (id) => journeys.find((j) => j.id === id);
 // Small helpers used by several pages
 export const money = (n) => `£${n.toFixed(2)}`;
 export const esc = (text) => String(text).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+// ---------- Lines (shared by Home and the Lines page) ----------
+// kind: 'delay' = unplanned, refund possible | 'closure' = planned, not eligible | 'good'
+// colour/text = TfL line colour + a text colour that passes contrast on it.
+export const lines = [
+  { id: 'victoria', name: 'Victoria', letter: 'V', colour: '#0098D4', text: '#0B0C0C', yours: true,
+    kind: 'delay', status: 'Severe delays',
+    detail: 'Signal failure at Oxford Circus. Trains are running every 8 to 10 minutes.',
+    when: 'Since 07:52 today', journeyId: 'j1' },
+  { id: 'central', name: 'Central', letter: 'C', colour: '#DC241F', text: '#FFFFFF', yours: true,
+    kind: 'delay', status: 'Minor delays',
+    detail: 'An earlier faulty train at Liverpool Street. Some trains are running slower than usual.',
+    when: 'Since 08:20 today' },
+  { id: 'northern', name: 'Northern', letter: 'N', colour: '#000000', text: '#FFFFFF', yours: true,
+    kind: 'closure', status: 'Planned closure',
+    detail: 'No trains between Camden Town and Kennington. Rail replacement buses run every 5 minutes.',
+    when: 'Sat 17 to Sun 18 October, all day',
+    alternative: 'Try the Victoria line between Euston and Warren Street instead.' },
+  { id: 'jubilee', name: 'Jubilee', letter: 'J', colour: '#A0A5A9', text: '#0B0C0C', yours: false,
+    kind: 'closure', status: 'Part closure',
+    detail: 'No service between Finchley Road and Stanmore. Use the Metropolitan line.',
+    when: 'Sunday 11 October, until 21:00',
+    alternative: 'The Metropolitan line runs between Finchley Road and Wembley Park.' },
+  { id: 'elizabeth', name: 'Elizabeth', letter: 'E', colour: '#6950A1', text: '#FFFFFF', yours: true,
+    kind: 'good', status: 'Good service', detail: 'Trains are running normally.' },
+  { id: 'piccadilly', name: 'Piccadilly', letter: 'P', colour: '#003688', text: '#FFFFFF', yours: false,
+    kind: 'good', status: 'Good service', detail: 'Trains are running normally.' },
+  { id: 'district', name: 'District', letter: 'D', colour: '#007D32', text: '#FFFFFF', yours: false,
+    kind: 'good', status: 'Good service', detail: 'Trains are running normally.' },
+  { id: 'overground', name: 'Overground', letter: 'O', colour: '#EE7C0E', text: '#0B0C0C', yours: false,
+    kind: 'good', status: 'Good service', detail: 'Trains are running normally.' },
+];
+
+export const findLine = (id) => lines.find((l) => l.id === id);

@@ -1,7 +1,8 @@
 // Home page. Built from `homeData` plus the shared journeys and pots in data.js.
 // The data is hard-coded for now. Later it comes from GET /summary, /status and /journeys.
-import { journeys, pots, STATUS, money, esc } from '../data.js';
+import { journeys, pots, lines, STATUS, money, esc } from '../data.js';
 import { potForJourney } from '../pots-store.js';
+import { lineBadge, lineStateHtml } from './lines.js';
 
 const homeData = {
   firstName: 'Lena',
@@ -62,15 +63,22 @@ function overviewHtml({ firstName, reclaimed }) {
 }
 
 // Line bullet + name + status word. Status uses an icon AND words, not colour alone.
-function linesHtml({ lines }) {
-  const rows = lines.map((line) => `<li class="line-row">
-      <span class="bt-bullet" aria-hidden="true">${esc(line.letter)}</span>
-      <span class="line-name">${esc(line.name)}</span>
-      <span class="line-state ${line.ok ? 'is-ok' : 'is-bad'}"><span aria-hidden="true">${line.ok ? '✓' : '!'}</span> ${esc(line.status)}</span>
+// Your lines, each linking to that line on the Lines page. Icon AND words, not colour alone.
+function linesHtml() {
+  const rows = lines.filter((l) => l.yours).map((line) => `<li>
+      <a class="line-row" href="#/lines/${esc(line.id)}">
+        ${lineBadge(line)}
+        <span class="line-name">${esc(line.name)}</span>
+        ${lineStateHtml(line)}
+        <span class="line-chevron" aria-hidden="true">›</span>
+      </a>
     </li>`).join('');
 
   return `<section aria-labelledby="lines-heading">
-    <h2 id="lines-heading" class="bt-kicker section-kicker">Your lines now</h2>
+    <div class="section-head">
+      <h2 id="lines-heading" class="bt-kicker section-kicker">Your lines now</h2>
+      <a class="text-link" href="#/lines">All lines</a>
+    </div>
     <ul class="line-status">${rows}</ul>
   </section>`;
 }

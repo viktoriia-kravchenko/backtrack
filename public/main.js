@@ -13,6 +13,7 @@ import journeysPage from './pages/journeys.js';
 import refundPage from './pages/refund.js';
 import potsPage from './pages/pots.js';
 import placeholderPage from './pages/placeholder.js';
+import linesPage from './pages/lines.js';
 
 const routes = {
   loading: loadingPage,
@@ -21,7 +22,8 @@ const routes = {
   journey: refundPage, // #/journey/j1 opens the refund page for journey j1
   pots: potsPage,      // #/pots/<id> opens that pot
   pot: potsPage,       // the tab bar, Home's pot card and "Open pot" link to #/pot
-  network: placeholderPage('Network', 'network'),
+  lines: linesPage,
+  network: linesPage,
 };
 
 // The top bar is in index.html. The navbar and menu are created once and stay between pages.
