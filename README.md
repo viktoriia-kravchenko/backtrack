@@ -16,11 +16,20 @@ Money that is owed goes unclaimed.
 
 ## The idea
 
-A customer taps **"Delayed? Claim a refund"** on a TfL contactless charge in their banking app.
-The bank prefills the claim from what it already knows, checks it against TfL's rules and line
-status, and sends it to TfL with the customer's consent. Nothing is sent without the customer
-confirming the journey details first. The app then tracks the claim to a decision, and the refund
-can go straight into a pot.
+1. **Spot it.** The Home screen lists recent journeys and marks the ones that qualify, for example
+   "Eligible £2.90". The customer taps one.
+2. **Prefilled form.** The refund form opens already filled in with what the bank knows: date,
+   stations, start time and card. The customer picks the line they took and enters how many
+   minutes late they were.
+3. **Checked for you.** Backtrack checks the claim against TfL's rules (28-day window, minimum
+   delay for the mode) and TfL's line status (was there a disruption, and was it within TfL's control).
+4. **Pot and consent.** The customer chooses which pot the refund should go into, then consents to
+   sharing their name, email, card token and journey with TfL. Nothing is sent without this.
+5. **Send claim.** One tap on **Send claim to TfL** submits it.
+6. **Live tracker.** A "Your refund, step by step" timeline updates as the claim moves through
+   Delayed, Checked, Claimed, Paid and Saved.
+7. **Money lands in the pot.** When TfL approves, the refund goes back to the card and is moved
+   into the chosen pot, with an **Open pot** button.
 
 > **TfL has no public API for refund claims.** The refund API here is a mock of what a
 > bank-TfL partnership could look like. Nothing is sent to the real TfL.
