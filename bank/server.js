@@ -23,7 +23,7 @@ const { createStore } = require('./data');
 const { createLineStatusClient, createRefundClient, TflError } = require('./tflClient');
 
 const DRAFT_TTL_MS = 30 * 60_000;
-const CONSENT_STATEMENT = 'I agree to Kite Bank sending my name, email, card token and journey details to TfL to claim a service delay refund for me.';
+const CONSENT_STATEMENT = 'I agree to Backtrack sending my name, email, card token and journey details to TfL to claim a service delay refund for me.';
 const PUBLIC_DIR = path.join(__dirname, '..', 'public');
 const STATIC_FILES = {
   '/': ['index.html', 'text/html; charset=utf-8'],
@@ -43,11 +43,6 @@ const STATIC_FILES = {
   '/components/navbar.js': ['components/navbar.js', 'text/javascript; charset=utf-8'],
   '/components/menu.js': ['components/menu.js', 'text/javascript; charset=utf-8'],
     '/logo.svg': ['logo.svg', 'image/svg+xml'],
-  // Old Kite claim demo
-  '/kite.html': ['kite.html', 'text/html; charset=utf-8'],
-  '/app.js': ['app.js', 'text/javascript; charset=utf-8'],
-  '/styles.css': ['styles.css', 'text/css; charset=utf-8'],
-  
 };
 
 function createBankServer({

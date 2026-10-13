@@ -1,23 +1,43 @@
-# Backtrack: TfL delay refunds, rerouted (hackathon prototype)
+# Backtrack: TfL delay refunds, rerouted
 
-*Refunds rerouted.* Backtrack spots TfL journeys that qualify for a delay refund, helps the customer
-claim, and saves the money into a pot (an Engine Space) when it lands.
+*Refunds rerouted.* A hackathon prototype of a banking-app feature that finds TfL journeys
+eligible for a delay refund, helps the customer claim, and saves the money into a pot
+(an Engine Space) when it lands.
+
+**[Live demo](https://backtrack-6w89.vercel.app/)** · **[Pitch slides](https://bit.ly/47fjhpf)**
+
+> Built on Engine by Starling.
+
+## The problem
+
+TfL refunds delayed journeys, but almost nobody claims. Customers have to remember the delay,
+find the right form within 28 days, and re-enter journey details their bank already knows.
+Money that is owed goes unclaimed.
+
+## The idea
 
 A customer taps **"Delayed? Claim a refund"** on a TfL contactless charge in their banking app.
 The bank prefills the claim from what it already knows, checks it against TfL's rules and line
 status, and sends it to TfL with the customer's consent. Nothing is sent without the customer
-confirming the journey details first. The app then tracks the claim to a decision.
+confirming the journey details first. The app then tracks the claim to a decision, and the refund
+can go straight into a pot.
 
 > **TfL has no public API for refund claims.** The refund API here is a mock of what a
 > bank-TfL partnership could look like. Nothing is sent to the real TfL.
 
-## Run it
+## Try it
+
+- **Online:** open the [live demo](https://backtrack-6w89.vercel.app/). It is designed as a phone
+  app, so it looks best on a phone or in a narrow browser window.
+- **Locally:** see below.
+
+## Run it locally
 
 Needs Node 18+. No dependencies to install.
 
 ```bash
 npm start   # banking app on http://localhost:3000, mock TfL on http://localhost:4001
-npm test    # 12 end-to-end tests
+npm test    # 17 end-to-end tests
 ```
 
 Demo data is relative to today, so it always works:
@@ -140,5 +160,6 @@ public/               banking app UI (plain HTML/CSS/JS)
   logo.svg            app icon / favicon
   main.js             router: #/home, #/journeys, #/journey/<id>, #/pots, #/lines
   pages/              one file per screen: loading (welcome), home, journeys, refund, pots, lines
+  components/         top menu and tab bar
 test/flow.test.js     end-to-end tests
 ```

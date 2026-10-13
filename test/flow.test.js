@@ -55,10 +55,74 @@ test.after(() => {
   bank.close();
 });
 
-test('serves the banking app page', async () => {
-  const res = await fetch(`${bankUrl}/`);
-  assert.equal(res.status, 200);
-  assert.match(await res.text(), /Kite/);
+test('serves the banking app and every script, stylesheet and page it loads', async () => {
+  const home = await fetch(`${bankUrl}/`);
+  assert.equal(home.status, 200);
+  assert.match(await home.text(), /<title>Backtrack<\/title>/);
+
+  const assets = [
+    '/main.js', '/backtrack.css', '/logo.svg', '/api.js', '/data.js', '/journeys.js', '/pots-store.js',
+    '/components/navbar.js', '/components/menu.js',
+    '/pages/loading.js', '/pages/home.js', '/pages/journeys.js', '/pages/refund.js', '/pages/pots.js', '/pages/lines.js',
+  ];
+  for (const path of assets) {
+    const res = await fetch(bankUrl + path);
+    assert.equal(res.status, 200, `${path} should be served`);
+  }
+});
+
+test('profile exposes name, email and cards without card tokens', async () => {
+  const { status, body } = await bankCall('GET', '/api/me');
+  assert.equal(status, 200);
+  assert.equal(body.name, 'Lena Oxton');
+  assert.equal(body.cards[0].last4, '4821');
+  assert.equal(JSON.stringify(body).includes('tok_'), false);
+});
+
+test('transactions mark TfL charges with a travel date one day before posting', async () => {
+  const { body: txns } = await bankCall('GET', '/api/transactions');
+  const tfl = txns.filter((t) => t.isTflContactless);
+  assert.ok(tfl.length >= 6, 'demo data has TfL charges');
+  for (const t of tfl) {
+    assert.ok(t.travelDate, 'TfL charge has a travel date');
+    assert.deepEqual(t.claimIds, t.claimIds.filter(Boolean));
+  }
+  assert.ok(txns.some((t) => !t.isTflContactless && t.travelDate === undefined));
+});
+
+test('only TfL charges can start a claim, and unknown ones are 404', async () => {
+  const { body: txns } = await bankCall('GET', '/api/transactions');
+  const other = txns.find((t) => !t.isTflContactless);
+  const notTfl = await bankCall('POST', '/api/tfl-claims/draft', { transactionId: other.id });
+  assert.equal(notTfl.status, 422);
+  assert.equal(notTfl.body.error.code, 'NOT_A_TFL_CHARGE');
+
+  const missing = await bankCall('POST', '/api/tfl-claims/draft', { transactionId: 'nope' });
+  assert.equal(missing.status, 404);
+  assert.equal(missing.body.error.code, 'TRANSACTION_NOT_FOUND');
+});
+
+test('draft ranks saved journeys with the in-control disruption first', async () => {
+  const draft = await draftForTravelDay(2);
+  assert.ok(draft.candidates.length > 1);
+  assert.equal(draft.candidates[0].line, 'victoria');
+  assert.equal(draft.candidates[0].disruption.withinControl, true);
+  assert.equal(draft.candidates[0].line, draft.prefill.journey.line);
+  assert.ok(draft.lines.some((l) => l.id === 'victoria'));
+  assert.match(draft.consentStatement, /TfL/);
+});
+
+test('unknown drafts and claims are 404', async () => {
+  const check = await bankCall('POST', '/api/tfl-claims/check', { draftId: 'drf_nope', journey: {} });
+  assert.equal(check.status, 404);
+  assert.equal(check.body.error.code, 'DRAFT_NOT_FOUND');
+
+  const submitted = await bankCall('POST', '/api/tfl-claims', { draftId: 'drf_nope', consent: { accepted: true }, journey: {} });
+  assert.equal(submitted.status, 404);
+
+  const claim = await bankCall('GET', '/api/tfl-claims/clm_nope');
+  assert.equal(claim.status, 404);
+  assert.equal(claim.body.error.code, 'CLAIM_NOT_FOUND');
 });
 
 test('draft is prefilled from bank data and picks the disrupted journey', async () => {
